@@ -56,7 +56,7 @@ export default async function HomePage() {
     };
   }
 
-  const badges = (badgeRows ?? []).map((r) => (r as { badge: Badge }).badge).filter(Boolean);
+  const badges = (badgeRows ?? []).map((r) => (r as unknown as { badge: Badge }).badge).filter(Boolean);
   const doneIds = (logs ?? []).filter((l) => l.status).map((l) => l.habit_id);
 
   return (
