@@ -14,7 +14,7 @@ export default async function MyProfilePage() {
     supabase.from("profiles").select("username,avatar_url,current_streak,best_streak").eq("id", userId).single(),
     supabase.from("user_badges").select("badge:badges(code,name,description,icon)").eq("user_id", userId),
   ]);
-  const badges = (badgeRows ?? []).map((r) => (r as { badge: Badge }).badge).filter(Boolean);
+  const badges = (badgeRows ?? []).map((r) => (r as unknown as { badge: Badge }).badge).filter(Boolean);
 
   return (
     <ProfileView
