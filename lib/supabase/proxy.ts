@@ -30,6 +30,7 @@ export async function updateSession(request: NextRequest) {
 
   // Routes publiques : login, signup, confirmation e-mail
   const isPublic =
+    request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/signup") ||
     request.nextUrl.pathname.startsWith("/auth");
