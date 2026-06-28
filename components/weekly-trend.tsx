@@ -19,7 +19,7 @@ export function WeeklyTrend({ data }: { data: { date: string; score: number }[] 
           cursor={{ fill: "rgba(255,255,255,0.04)" }}
           contentStyle={{ background: "#171717", border: "1px solid #404040", borderRadius: 8 }}
           labelStyle={{ color: "#a3a3a3" }}
-          formatter={(v: number | undefined) => [`${v ?? 0}/100`, "Score"]}
+          formatter={(v: any) => [`${v ?? 0}/100`, "Score"]}
         />
         <Bar dataKey="score" radius={[6, 6, 0, 0]} maxBarSize={36}>
           {chart.map((d, i) => <Cell key={i} fill={barColor(d.score)} />)}
