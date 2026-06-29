@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserGroups } from "@/lib/data/groups";
-import { GroupsPanel } from "@/components/groups-panel";
+import { GroupsPanel } from "@/components/groups/groups-panel";
 
 export default async function GroupesPage() {
   const supabase = await createClient();

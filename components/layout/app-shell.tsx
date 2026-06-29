@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Flame, Home, Users, ListChecks, User, LogOut, Target } from "lucide-react";
 import { motion } from "framer-motion";
-import { Avatar } from "@/components/avatar";
+import { Avatar } from "@/components/profile/avatar";
 import { signout } from "@/app/auth/actions";
-import { PageTransition } from "@/components/page-transition";
+import { PageTransition } from "@/components/layout/page-transition";
 
 const NAV = [
   { href: "/home",      label: "Aujourd'hui", Icon: Home },
@@ -30,6 +30,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh">
+      <a href="#main-content" className="skip-link">Aller au contenu</a>
 
       {/* ── Desktop Sidebar ───────────────────────────────────────────── */}
       <aside
@@ -135,6 +136,7 @@ export function AppShell({
               <motion.button
                 type="submit"
                 title="Se déconnecter"
+                aria-label="Se déconnecter"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.88 }}
                 className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150"
@@ -149,7 +151,7 @@ export function AppShell({
 
       {/* ── Main content ──────────────────────────────────────────────── */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex-1 px-4 pb-28 pt-8 md:px-12 md:pb-12 md:pt-10">
+        <main id="main-content" className="flex-1 px-4 pb-28 pt-8 md:px-12 md:pb-12 md:pt-10">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

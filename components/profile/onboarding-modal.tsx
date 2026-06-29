@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Camera, Users, ListChecks, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { AvatarUploader } from "@/components/avatar-uploader";
+import { AvatarUploader } from "@/components/profile/avatar-uploader";
 import { createHabit } from "@/app/(app)/habits/actions";
 import type { HabitLevel } from "@/lib/types";
 
@@ -121,6 +121,9 @@ export function OnboardingModal({
           animate={{ y: 0, opacity: 1, scale: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Configuration du compte"
           className="relative w-full max-w-md overflow-hidden rounded-t-[32px] sm:rounded-[28px]"
           style={{
             background: "var(--color-surface)",

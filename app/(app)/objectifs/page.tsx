@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGoals } from "@/lib/data/goals";
-import { GoalsManager } from "@/components/goals-manager";
+import { GoalsManager } from "@/components/goals/goals-manager";
 import type { Goal } from "@/lib/types";
 
 export default async function ObjectifsPage() {

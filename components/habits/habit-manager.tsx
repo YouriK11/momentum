@@ -7,7 +7,7 @@ import { Plus, Archive, ChevronRight, Pencil, CalendarDays } from "lucide-react"
 import { createClient } from "@/lib/supabase/client";
 import type { Habit, HabitLevel, HabitFrequency } from "@/lib/types";
 import { archiveHabit } from "@/app/(app)/habits/actions";
-import { HabitSheet } from "@/components/habit-sheet";
+import { HabitSheet } from "@/components/habits/habit-sheet";
 import { useToast } from "@/components/ui/toast";
 
 // ── Constants ──────────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveHabits } from "@/lib/data/habits";
 import { getUserGroups } from "@/lib/data/groups";
-import { HabitManager } from "@/components/habit-manager";
+import { HabitManager } from "@/components/habits/habit-manager";
 import type { Habit } from "@/lib/types";
 
 export default async function HabitsPage() {

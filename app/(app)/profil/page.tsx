@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/data/profile";
-import { ProfileView } from "@/components/profile-view";
-import { AvatarUploader } from "@/components/avatar-uploader";
+import { ProfileView } from "@/components/profile/profile-view";
+import { AvatarUploader } from "@/components/profile/avatar-uploader";
 import type { Badge } from "@/lib/types";
 
 export default async function MyProfilePage() {

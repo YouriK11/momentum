@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { Crown, Users } from "lucide-react";
-import { Avatar } from "@/components/avatar";
+import { Avatar } from "@/components/profile/avatar";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 export type SegRow = { userId: string; username: string; avatarUrl: string | null; value: number };
@@ -53,10 +53,7 @@ export function GroupSegment({ name, groupId, rows, meId }: {
       </div>
 
       {/* Leaderboard card */}
-      <div
-        className="overflow-hidden rounded-[20px]"
-        style={{ border: "1px solid rgba(255,255,255,0.07)" }}
-      >
+      <div className="card overflow-hidden">
         {ranked.map((r, i) => {
           const isMe    = r.userId === meId;
           const isTop3  = i < 3;

@@ -5,13 +5,13 @@ import { getActiveHabits, getTodayLogs } from "@/lib/data/habits";
 import { getScoresFrom } from "@/lib/data/scores";
 import { getFirstGroup, getGroupLeaderboard } from "@/lib/data/groups";
 import { getRecentHabitLogs } from "@/lib/data/habits";
-import { TodaySession } from "@/components/today-session";
-import { WeekStats } from "@/components/week-stats";
-import { ActivityFeed } from "@/components/activity-feed";
-import { GroupSegment, EmptyGroup, type SegRow } from "@/components/group-segment";
-import { Rewards } from "@/components/rewards";
-import { OnboardingModal } from "@/components/onboarding-modal";
-import { InsightCards, computeInsights } from "@/components/insights";
+import { TodaySession } from "@/components/today/today-session";
+import { WeekStats } from "@/components/today/week-stats";
+import { ActivityFeed } from "@/components/today/activity-feed";
+import { GroupSegment, EmptyGroup, type SegRow } from "@/components/groups/group-segment";
+import { Rewards } from "@/components/profile/rewards";
+import { OnboardingModal } from "@/components/profile/onboarding-modal";
+import { InsightCards, computeInsights } from "@/components/today/insights";
 import type { Habit, Badge } from "@/lib/types";
 
 export default async function HomePage() {

@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Avatar } from "@/components/avatar";
+import { Avatar } from "@/components/profile/avatar";
 
 export function AvatarUploader({
   userId, username, avatarUrl,

@@ -45,10 +45,7 @@ export function ActivityFeed({ days }: { days: Day[] }) {
     <div className="flex flex-col gap-4">
       <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">Activité récente</p>
 
-      <div
-        className="overflow-hidden rounded-[20px]"
-        style={{ border: "1px solid rgba(255,255,255,0.07)" }}
-      >
+      <div className="card overflow-hidden">
         {days.map((d, i) => {
           const dt      = new Date(d.score_date);
           const accent  = scoreAccent(d.score);

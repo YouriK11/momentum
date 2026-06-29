@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ScoreGauge } from "@/components/score-gauge";
-import { WeeklyTrend } from "@/components/weekly-trend";
+import { ScoreGauge } from "@/components/today/score-gauge";
+import { WeeklyTrend } from "@/components/today/weekly-trend";
 import { signout } from "@/app/auth/actions";
 import type { Habit, DayScore, Badge } from "@/lib/types";
 

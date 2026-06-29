@@ -127,6 +127,13 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
           style={{ background: `linear-gradient(90deg, transparent, ${zone}65, transparent)`, transition: "background 0.4s ease" }}
         />
 
+        {/* Live score announcement for screen readers */}
+        <span className="sr-only" aria-live="polite" aria-atomic="true">
+          {isEmpty
+            ? "Aucune habitude pour aujourd'hui."
+            : `Score ${score} sur 100. ${done.size} habitude${done.size > 1 ? "s" : ""} sur ${habits.length} complétée${done.size > 1 ? "s" : ""}.`}
+        </span>
+
         <div className="flex items-center gap-8">
           {/* Circular gauge — plus grande */}
           <div className="relative h-40 w-40 shrink-0">

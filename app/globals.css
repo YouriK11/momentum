@@ -32,6 +32,33 @@
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
+/*  DESIGN TOKENS — SCALES                                                 */
+/*                                                                         */
+/*  Spacing (multiples of 4px — Tailwind classes):                         */
+/*    xs  4px   gap-1  p-1                                                 */
+/*    sm  8px   gap-2  p-2                                                 */
+/*    md  16px  gap-4  p-4                                                 */
+/*    lg  24px  gap-6  p-6                                                 */
+/*    xl  32px  gap-8  p-8                                                 */
+/*    2xl 40px  gap-10 p-10                                                */
+/*    3xl 48px  gap-12 p-12                                                */
+/*                                                                         */
+/*  Typography (font-display = Archivo, font-sans = Inter):                */
+/*    hero     clamp(32px, 3.5vw, 48px)  font-display font-black  → h1    */
+/*    title    24px / text-2xl           font-display font-black  → h2    */
+/*    subtitle 20px / text-xl            font-display font-black  → h3    */
+/*    body-lg  15px / text-[15px]        font-sans    font-medium → main   */
+/*    body     14px / text-sm            font-sans    font-normal → text   */
+/*    label    13px / text-[13px]        font-sans    font-medium → meta   */
+/*    caption  11px / text-[11px]        font-sans    font-semibold uppercase tracking-widest → section headers */
+/*    micro    10px / text-[10px]        font-sans    font-bold   → nav labels */
+/*                                                                         */
+/*  Cards — always use .card for surface containers:                       */
+/*    radius 20px · border rgba(255,255,255,0.065) · bg var(--color-surface) */
+/*    Use .card.overflow-hidden to clip animated children.                 */
+/* ────────────────────────────────────────────────────────────────────── */
+
+/* ────────────────────────────────────────────────────────────────────── */
 /*  BASE                                                                  */
 /* ────────────────────────────────────────────────────────────────────── */
 @layer base {
@@ -172,6 +199,24 @@
   .auth-submit:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+  }
+
+  /* Skip navigation link — visible only on keyboard focus */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 4px;
+    z-index: 9999;
+    padding: 8px 16px;
+    background: var(--color-primary);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    left: 4px;
   }
 
   /* Skeleton shimmer loader */

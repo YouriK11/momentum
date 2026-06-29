@@ -122,6 +122,9 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
           <motion.div
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 275, damping: 30 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="habit-sheet-title"
             className="fixed inset-x-0 bottom-0 z-50 overflow-y-auto rounded-t-[28px]"
             style={{
               maxHeight: "92dvh",
@@ -140,7 +143,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
             {/* Header */}
             <div className="flex items-center justify-between px-5 pb-5 pt-3">
               <div>
-                <h2 className="font-display text-xl font-black">
+                <h2 id="habit-sheet-title" className="font-display text-xl font-black">
                   {isEdit ? "Modifier l'habitude" : "Nouvelle habitude"}
                 </h2>
                 <p className="mt-0.5 text-xs text-muted">
@@ -150,6 +153,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
               <motion.button
                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
                 onClick={handleClose}
+                aria-label="Fermer"
                 className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-foreground"
               >
                 <X size={16} />

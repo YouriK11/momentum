@@ -7,7 +7,7 @@ import { Copy, Check, UserMinus, Trash2, UserPlus, AlertTriangle } from "lucide-
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import { Avatar } from "@/components/avatar";
+import { Avatar } from "@/components/profile/avatar";
 
 export interface GroupMember {
   userId: string;

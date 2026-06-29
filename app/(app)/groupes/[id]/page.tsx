@@ -1,8 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGroupById, getGroupLeaderboard } from "@/lib/data/groups";
-import { Leaderboard } from "@/components/leaderboard";
-import { GroupActions, type GroupMember } from "@/components/group-actions";
+import { Leaderboard } from "@/components/groups/leaderboard";
+import { GroupActions, type GroupMember } from "@/components/groups/group-actions";
 
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
