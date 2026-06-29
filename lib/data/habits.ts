@@ -29,3 +29,13 @@ export function getTodayLogs(db: TypedDb, userId: string, today: string) {
     .eq("user_id", userId)
     .eq("log_date", today);
 }
+
+// Logs cochés (status=true) depuis fromDate — pour insights et heatmap.
+export function getRecentHabitLogs(db: TypedDb, userId: string, fromDate: string) {
+  return db
+    .from("habit_logs")
+    .select("habit_id,log_date")
+    .eq("user_id", userId)
+    .eq("status", true)
+    .gte("log_date", fromDate);
+}

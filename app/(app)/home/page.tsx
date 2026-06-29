@@ -4,12 +4,14 @@ import { getProfile } from "@/lib/data/profile";
 import { getActiveHabits, getTodayLogs } from "@/lib/data/habits";
 import { getScoresFrom } from "@/lib/data/scores";
 import { getFirstGroup, getGroupLeaderboard } from "@/lib/data/groups";
+import { getRecentHabitLogs } from "@/lib/data/habits";
 import { TodaySession } from "@/components/today-session";
 import { WeekStats } from "@/components/week-stats";
 import { ActivityFeed } from "@/components/activity-feed";
 import { GroupSegment, EmptyGroup, type SegRow } from "@/components/group-segment";
 import { Rewards } from "@/components/rewards";
 import { OnboardingModal } from "@/components/onboarding-modal";
+import { InsightCards, computeInsights } from "@/components/insights";
 import type { Habit, Badge } from "@/lib/types";
 
 export default async function HomePage() {
@@ -28,6 +30,7 @@ export default async function HomePage() {
     { data: scores14 },
     { data: badgeRows },
     { data: firstGroup },
+    { data: recentLogs },
   ] = await Promise.all([
     getProfile(supabase, userId),
     getActiveHabits(supabase, today),   // filtrée sur les habitudes prévues aujourd'hui
@@ -35,6 +38,7 @@ export default async function HomePage() {
     getScoresFrom(supabase, userId, day13),
     supabase.from("user_badges").select("badge:badges(code,name,description,icon)").eq("user_id", userId),
     getFirstGroup(supabase),
+    getRecentHabitLogs(supabase, userId, day7),
   ]);
 
   // ── Weekly stats ──────────────────────────────────────────────────────────────
@@ -61,6 +65,13 @@ export default async function HomePage() {
 
   const badges  = (badgeRows ?? []).map((r) => (r as unknown as { badge: Badge }).badge).filter(Boolean);
   const doneIds = (logs ?? []).filter((l) => l.status).map((l) => l.habit_id);
+
+  const insights = computeInsights({
+    habits:     (habits ?? []).map((h) => ({ id: h.id, name: h.name, icon: h.icon })),
+    recentLogs: recentLogs ?? [],
+    scores14:   scores14 ?? [],
+    streak:     profile?.current_streak ?? 0,
+  });
 
   const showOnboarding = !profile?.onboarded && (habits ?? []).length === 0 && !firstGroup;
 
@@ -95,6 +106,7 @@ export default async function HomePage() {
           delta={delta}
         />
         <ActivityFeed days={[...inWeek].reverse()} />
+        <InsightCards insights={insights} />
         {segment
           ? <GroupSegment name={segment.name} groupId={segment.id} rows={segment.rows} meId={userId} />
           : <EmptyGroup />}

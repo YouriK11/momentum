@@ -7,6 +7,7 @@ import { Copy, Check, UserMinus, Trash2, UserPlus, AlertTriangle } from "lucide-
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
+import { Avatar } from "@/components/avatar";
 
 export interface GroupMember {
   userId: string;
@@ -152,16 +153,7 @@ export function GroupActions({ groupId, groupName, inviteCode, isOwner, members,
                   className="flex items-center gap-3 rounded-[12px] px-3 py-2"
                   style={{ background: "var(--color-surface-2)" }}
                 >
-                  <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                    style={{
-                      background: "rgba(252,82,0,0.15)",
-                      color: "var(--color-primary)",
-                    }}
-                    aria-hidden
-                  >
-                    {m.username[0]?.toUpperCase()}
-                  </span>
+                  <Avatar url={m.avatarUrl} name={m.username} size={32} />
                   <span className="flex-1 text-[14px] font-medium">
                     {m.username}
                     {m.userId === meId && (
