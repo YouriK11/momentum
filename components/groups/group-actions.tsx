@@ -106,7 +106,7 @@ export function GroupActions({ groupId, groupName, inviteCode, isOwner, members,
           <div className="mt-2 flex items-center gap-3">
             <span
               className="flex-1 rounded-[10px] px-4 py-2.5 font-mono text-lg tracking-[0.15em] text-primary"
-              style={{ background: "var(--color-surface-2)", border: "1px solid rgba(252,82,0,0.2)" }}
+              style={{ background: "var(--color-surface-2)", border: "1px solid rgba(203,139,106,0.2)" }}
             >
               {inviteCode}
             </span>
@@ -218,10 +218,10 @@ export function GroupActions({ groupId, groupName, inviteCode, isOwner, members,
               aria-labelledby="delete-dialog-title"
               className="card fixed left-1/2 top-1/2 z-50 w-[min(90vw,400px)] -translate-x-1/2 -translate-y-1/2 p-6"
             >
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "rgba(236,100,128,0.12)" }}>
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "rgba(207,139,136,0.12)" }}>
                 <AlertTriangle size={22} style={{ color: "var(--color-danger)" }} />
               </div>
-              <h2 id="delete-dialog-title" className="font-display text-lg font-black">
+              <h2 id="delete-dialog-title" className="font-display text-lg font-semibold">
                 Supprimer « {groupName} » ?
               </h2>
               <p className="mt-2 text-[14px] text-muted">

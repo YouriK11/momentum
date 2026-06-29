@@ -30,7 +30,7 @@ export function computeInsights(opts: {
         icon:  best.icon ?? "🏆",
         title: "Ta meilleure habitude",
         body:  `${best.name} — cochée ${bestCount} fois cette semaine.`,
-        color: "#ffc24b",
+        color: "#c4a882",
       });
     }
   }
@@ -50,17 +50,17 @@ export function computeInsights(opts: {
         icon:  "📅",
         title: "Meilleur jour",
         body:  `Tu es le plus actif le ${DOW_FR[best.d]} (score moyen ${Math.round(best.avg)}/100).`,
-        color: "#37c97e",
+        color: "#8faa7e",
       });
     }
   }
 
   if (streak >= 7) {
-    insights.push({ icon: "🔥", title: "Série impressionnante", body: `${streak} jours consécutifs — tu es dans une vraie dynamique.`, color: "#fc5200" });
+    insights.push({ icon: "🔥", title: "Série impressionnante", body: `${streak} jours consécutifs — tu es dans une vraie dynamique.`, color: "#cb8b6a" });
   } else if (streak >= 3) {
-    insights.push({ icon: "⚡", title: "Série en cours", body: `${streak} jours de suite — continue sur ta lancée !`, color: "#fc5200" });
+    insights.push({ icon: "⚡", title: "Série en cours", body: `${streak} jours de suite — continue sur ta lancée !`, color: "#cb8b6a" });
   } else if (streak === 0 && scores14.some((s) => s.score > 0)) {
-    insights.push({ icon: "💡", title: "Relancer la machine", body: "Tu as été actif récemment — une bonne journée aujourd'hui repart une série.", color: "#8e8e9a" });
+    insights.push({ icon: "💡", title: "Relancer la machine", body: "Tu as été actif récemment — une bonne journée aujourd'hui repart une série.", color: "#a89e8d" });
   }
 
   return insights.slice(0, 3);

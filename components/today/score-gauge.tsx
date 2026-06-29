@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 function colorFor(score: number) {
-  if (score >= 80) return { ring: "#34d399", text: "text-emerald-400", label: "En feu 🔥" };
-  if (score >= 50) return { ring: "#fb923c", text: "text-orange-400", label: "En bonne voie" };
-  return { ring: "#f87171", text: "text-red-400", label: "À relancer" };
+  if (score >= 80) return { ring: "#8faa7e", text: "text-[#8faa7e]", label: "Belle journée" };
+  if (score >= 50) return { ring: "#c4a882", text: "text-[#c4a882]", label: "Bonne avancée" };
+  return { ring: "#cf8b88", text: "text-[#cf8b88]", label: "À relancer" };
 }
 
 export function ScoreGauge({ score }: { score: number }) {

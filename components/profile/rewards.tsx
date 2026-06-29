@@ -12,12 +12,12 @@ export function Rewards({ badges }: { badges: Badge[] }) {
             key={b.code}
             className="card relative overflow-hidden p-5 transition-all hover:-translate-y-0.5"
             style={{
-              background: "linear-gradient(135deg, rgba(255,194,75,0.07) 0%, transparent 60%)",
+              background: "linear-gradient(135deg, rgba(196,168,130,0.07) 0%, transparent 60%)",
             }}
           >
             <div
               className="absolute inset-x-0 top-0 h-px"
-              style={{ background: "linear-gradient(90deg, transparent, rgba(255,194,75,0.3), transparent)" }}
+              style={{ background: "linear-gradient(90deg, transparent, rgba(196,168,130,0.3), transparent)" }}
             />
             <span className="text-3xl">{b.icon ?? "🏅"}</span>
             <p className="mt-2.5 text-[15px] font-semibold leading-tight">{b.name}</p>

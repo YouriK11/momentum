@@ -26,7 +26,7 @@ export function GoalsManager({ goals: initialGoals }: Props) {
 
   function onDone(id: string) {
     setGoals((prev) => prev.filter((g) => g.id !== id));
-    toast("Objectif atteint — bravo !", "success");
+    toast("Objectif atteint — bien joué !", "success");
   }
 
   return (
@@ -38,12 +38,12 @@ export function GoalsManager({ goals: initialGoals }: Props) {
           whileTap={{ scale: 0.98 }}
           onClick={() => setIsOpen(true)}
           className="flex w-full items-center justify-between rounded-[18px] border border-dashed px-6 py-5 text-left"
-          style={{ borderColor: "rgba(252,82,0,0.25)", background: "rgba(252,82,0,0.04)" }}
+          style={{ borderColor: "rgba(203,139,106,0.25)", background: "rgba(203,139,106,0.04)" }}
         >
           <span className="flex items-center gap-4">
             <span
               className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-primary"
-              style={{ boxShadow: "0 0 16px rgba(252,82,0,0.4)" }}
+              style={{ boxShadow: "none" }}
             >
               <Plus size={18} className="text-white" />
             </span>
@@ -61,7 +61,7 @@ export function GoalsManager({ goals: initialGoals }: Props) {
             animate={{ opacity: 1, y: 0 }}
             className="card flex flex-col items-center gap-3 p-12 text-center"
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(252,82,0,0.1)" }}>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(203,139,106,0.1)" }}>
               <Target size={24} style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
@@ -133,7 +133,7 @@ function GoalCard({ goal: g, index, onUpdated, onDone }: {
       <div className="flex items-start gap-3">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px]"
-          style={{ background: "rgba(252,82,0,0.12)" }}
+          style={{ background: "rgba(203,139,106,0.12)" }}
         >
           <Target size={18} style={{ color: "var(--color-primary)" }} />
         </div>
@@ -146,7 +146,7 @@ function GoalCard({ goal: g, index, onUpdated, onDone }: {
         <span
           className="shrink-0 rounded-[9px] px-2.5 py-1 text-[12px] font-bold tabular-nums"
           style={{
-            background: isComplete ? "rgba(55,201,126,0.15)" : "rgba(252,82,0,0.1)",
+            background: isComplete ? "rgba(143,170,126,0.15)" : "rgba(203,139,106,0.1)",
             color:      isComplete ? "var(--color-success)"  : "var(--color-primary)",
           }}
         >
@@ -162,7 +162,7 @@ function GoalCard({ goal: g, index, onUpdated, onDone }: {
           transition={{ type: "spring", stiffness: 55, damping: 16 }}
           style={{
             background: isComplete ? "var(--color-success)" : "var(--color-primary)",
-            boxShadow:  isComplete ? "0 0 10px rgba(55,201,126,0.5)" : "0 0 10px rgba(252,82,0,0.45)",
+            boxShadow:  "none",
           }}
         />
       </div>
@@ -285,7 +285,7 @@ function AddGoalSheet({ isOpen, onClose, onCreated }: {
 
             <div className="flex items-center justify-between px-5 pb-5 pt-3">
               <div>
-                <h2 className="font-display text-xl font-black">Nouvel objectif</h2>
+                <h2 className="font-display text-xl font-semibold">Nouvel objectif</h2>
                 <p className="mt-0.5 text-xs text-muted">Qu'est-ce que tu veux atteindre ?</p>
               </div>
               <button
@@ -335,7 +335,7 @@ function AddGoalSheet({ isOpen, onClose, onCreated }: {
 
               {error && (
                 <p className="rounded-[10px] px-4 py-3 text-sm font-medium"
-                  style={{ background: "rgba(236,100,128,0.12)", color: "#ec6480", border: "1px solid rgba(236,100,128,0.2)" }}>
+                  style={{ background: "rgba(207,139,136,0.12)", color: "var(--color-danger)", border: "1px solid rgba(207,139,136,0.2)" }}>
                   {error}
                 </p>
               )}
@@ -344,7 +344,7 @@ function AddGoalSheet({ isOpen, onClose, onCreated }: {
                 whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                 onClick={create} disabled={busy}
                 className="w-full rounded-[14px] py-4 text-sm font-bold text-white disabled:opacity-60"
-                style={{ background: "var(--color-primary)", boxShadow: "0 0 24px rgba(252,82,0,0.35)" }}
+                style={{ background: "var(--color-primary)" }}
               >
                 {busy ? "Création…" : "Créer l'objectif"}
               </motion.button>

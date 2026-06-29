@@ -42,7 +42,7 @@ export function ProfileView({
       <header>
         <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">Compte</p>
         <h1
-          className="mt-1 font-display font-black tracking-tight"
+          className="mt-1 font-display font-semibold tracking-tight"
           style={{ fontSize: "clamp(32px, 3.5vw, 48px)", letterSpacing: "-0.03em" }}
         >
           Mon profil
@@ -55,10 +55,10 @@ export function ProfileView({
         {/* Avatar card */}
         <div
           className="card relative flex flex-col items-center gap-5 overflow-hidden p-8"
-          style={{ backgroundImage: "linear-gradient(160deg, rgba(252,82,0,0.06) 0%, transparent 55%)" }}
+          style={{ backgroundImage: "linear-gradient(160deg, rgba(203,139,106,0.05) 0%, transparent 55%)" }}
         >
           <div className="absolute inset-x-0 top-0 h-px"
-            style={{ background: "linear-gradient(90deg, transparent, rgba(252,82,0,0.4), transparent)" }} />
+            style={{ background: "linear-gradient(90deg, transparent, rgba(203,139,106,0.3), transparent)" }} />
 
           <div className="relative">{children}</div>
 
@@ -79,7 +79,7 @@ export function ProfileView({
                     onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") cancel(); }}
                     maxLength={30}
                     autoFocus
-                    className="rounded-[10px] border px-3 py-1.5 text-center font-display text-lg font-black outline-none focus:border-primary/50"
+                    className="rounded-[10px] border px-3 py-1.5 text-center font-display text-lg font-semibold outline-none focus:border-primary/50"
                     style={{
                       background: "var(--color-surface-2)",
                       borderColor: "rgba(255,255,255,0.1)",
@@ -105,7 +105,7 @@ export function ProfileView({
                   exit={{ opacity: 0, y: -4 }}
                   className="flex items-center gap-2"
                 >
-                  <h2 className="font-display text-2xl font-black tracking-tight" style={{ letterSpacing: "-0.025em" }}>
+                  <h2 className="font-display text-2xl font-semibold tracking-tight" style={{ letterSpacing: "-0.025em" }}>
                     {username}
                   </h2>
                   <motion.button
@@ -128,24 +128,24 @@ export function ProfileView({
             className="flex w-full items-center justify-around rounded-[14px] py-3 lg:hidden"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
           >
-            <CompactStat label="Série"  value={streak}     suffix="j" color="#fc5200" />
-            <div className="h-8 w-px" style={{ background: "rgba(255,255,255,0.07)" }} />
-            <CompactStat label="Record" value={bestStreak} suffix="j" color="#ffc24b" />
-            <div className="h-8 w-px" style={{ background: "rgba(255,255,255,0.07)" }} />
-            <CompactStat label="Badges" value={badges.length} suffix="" color="#37c97e" />
+            <CompactStat label="Série"  value={streak}     suffix="j" color="#cb8b6a" />
+            <div className="h-8 w-px" style={{ background: "var(--color-border)" }} />
+            <CompactStat label="Record" value={bestStreak} suffix="j" color="#c4a882" />
+            <div className="h-8 w-px" style={{ background: "var(--color-border)" }} />
+            <CompactStat label="Badges" value={badges.length} suffix="" color="#8faa7e" />
           </div>
         </div>
 
         {/* Stats grid — desktop */}
         <div className="hidden grid-cols-2 gap-5 content-start lg:grid">
-          <StatCard label="Série actuelle"  value={streak}        suffix="j" color="#fc5200" description="Jours consécutifs d'activité" />
-          <StatCard label="Record personnel" value={bestStreak}   suffix="j" color="#ffc24b" description="Ta meilleure série all-time" />
-          <StatCard label="Badges obtenus"  value={badges.length} suffix=""  color="#37c97e" description="Trophées débloqués" />
+          <StatCard label="Série actuelle"   value={streak}        suffix="j" color="#cb8b6a" description="Jours consécutifs d'activité" />
+          <StatCard label="Meilleure série"  value={bestStreak}   suffix="j" color="#c4a882" description="Ton record personnel" />
+          <StatCard label="Badges obtenus"   value={badges.length} suffix="" color="#8faa7e" description="Trophées débloqués" />
           <div className="card flex flex-col gap-3 p-6"
             style={{ backgroundImage: "linear-gradient(135deg, rgba(138,138,152,0.05) 0%, transparent 60%)" }}>
             <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "var(--color-muted)" }}>Statut</p>
             <div>
-              <p className="font-display text-4xl font-black" style={{ color: "var(--color-foreground)" }}>Actif</p>
+              <p className="font-display text-4xl font-semibold" style={{ color: "var(--color-foreground)" }}>Actif</p>
               <p className="mt-1 text-[13px]" style={{ color: "var(--color-muted)" }}>En progression constante</p>
             </div>
           </div>
@@ -161,10 +161,10 @@ export function ProfileView({
               <div
                 key={b.code}
                 className="card relative overflow-hidden p-5 transition-all duration-200 hover:-translate-y-0.5"
-                style={{ backgroundImage: "linear-gradient(135deg, rgba(255,194,75,0.07) 0%, transparent 60%)" }}
+                style={{ backgroundImage: "linear-gradient(135deg, rgba(196,168,130,0.06) 0%, transparent 60%)" }}
               >
                 <div className="absolute inset-x-0 top-0 h-px"
-                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,194,75,0.35), transparent)" }} />
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(196,168,130,0.28), transparent)" }} />
                 <span className="text-3xl">{b.icon ?? "🏅"}</span>
                 <p className="mt-3 text-[14px] font-semibold leading-tight">{b.name}</p>
                 {b.description && (
@@ -202,7 +202,7 @@ function StatCard({ label, value, suffix, color, description }: {
       style={{ backgroundImage: `linear-gradient(135deg, ${color}09 0%, transparent 60%)` }}>
       <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "var(--color-muted)" }}>{label}</p>
       <div>
-        <p className="font-display text-4xl font-black tabular-nums leading-none" style={{ color }}>
+        <p className="font-display text-4xl font-semibold tabular-nums leading-none" style={{ color }}>
           {value}{suffix && <span className="ml-1 text-xl font-semibold" style={{ color: "var(--color-muted)" }}>{suffix}</span>}
         </p>
         <p className="mt-2 text-[13px]" style={{ color: "var(--color-muted)" }}>{description}</p>
@@ -215,7 +215,7 @@ function StatCard({ label, value, suffix, color, description }: {
 function CompactStat({ label, value, suffix, color }: { label: string; value: number; suffix: string; color: string }) {
   return (
     <div className="flex flex-col items-center gap-0.5 px-4">
-      <p className="font-display text-xl font-black tabular-nums" style={{ color }}>{value}{suffix}</p>
+      <p className="font-display text-xl font-semibold tabular-nums" style={{ color }}>{value}{suffix}</p>
       <p className="text-[11px]" style={{ color: "var(--color-muted)" }}>{label}</p>
     </div>
   );

@@ -35,7 +35,7 @@ export default function LoginPage() {
             top: "-25%", left: "-15%",
             width: 700, height: 700,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(252,82,0,0.13) 0%, transparent 68%)",
+            background: "radial-gradient(circle, rgba(203,139,106,0.12) 0%, transparent 68%)",
             filter: "blur(56px)",
           }}
         />
@@ -47,7 +47,7 @@ export default function LoginPage() {
             bottom: "-12%", right: "-12%",
             width: 560, height: 560,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(55,201,126,0.07) 0%, transparent 68%)",
+            background: "radial-gradient(circle, rgba(143,170,126,0.07) 0%, transparent 68%)",
             filter: "blur(56px)",
           }}
         />
@@ -68,18 +68,18 @@ export default function LoginPage() {
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px]"
             style={{
               background: "var(--color-primary)",
-              boxShadow: "0 0 28px rgba(252,82,0,0.5), 0 2px 8px rgba(0,0,0,0.4)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
             }}
           >
             <Flame size={20} className="text-white" />
           </div>
-          <span className="font-display text-xl font-black tracking-tight">Momentum</span>
+          <span className="font-display text-xl font-semibold tracking-tight">Momentum</span>
         </div>
 
         {/* Hero copy */}
         <div className="relative z-10">
           <h1
-            className="font-display font-black leading-[1.04] tracking-tight"
+            className="font-display font-semibold leading-[1.04] tracking-tight"
             style={{ fontSize: "clamp(38px, 4vw, 56px)", letterSpacing: "-0.035em" }}
           >
             Forge tes<br />
@@ -100,8 +100,8 @@ export default function LoginPage() {
                 <span
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px]"
                   style={{
-                    background: "rgba(252,82,0,0.11)",
-                    border: "1px solid rgba(252,82,0,0.2)",
+                    background: "rgba(203,139,106,0.11)",
+                    border: "1px solid rgba(203,139,106,0.2)",
                   }}
                 >
                   <Icon size={15} style={{ color: "var(--color-primary)" }} />
@@ -143,12 +143,12 @@ export default function LoginPage() {
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]"
             style={{
               background: "var(--color-primary)",
-              boxShadow: "0 0 20px rgba(252,82,0,0.4)",
+              boxShadow: "none",
             }}
           >
             <Flame size={17} className="text-white" />
           </div>
-          <span className="font-display text-xl font-black tracking-tight">Momentum</span>
+          <span className="font-display text-xl font-semibold tracking-tight">Momentum</span>
         </div>
 
         <div className="w-full max-w-[390px]">
@@ -156,7 +156,7 @@ export default function LoginPage() {
           {/* Heading */}
           <div className="mb-8">
             <h2
-              className="font-display text-[32px] font-black tracking-tight"
+              className="font-display text-[32px] font-semibold tracking-tight"
               style={{ letterSpacing: "-0.03em" }}
             >
               Connexion
@@ -203,8 +203,8 @@ export default function LoginPage() {
               <p
                 className="rounded-[10px] px-4 py-3 text-sm font-medium"
                 style={{
-                  background: "rgba(236,100,128,0.1)",
-                  border: "1px solid rgba(236,100,128,0.2)",
+                  background: "rgba(207,139,136,0.1)",
+                  border: "1px solid rgba(207,139,136,0.2)",
                   color: "var(--color-danger)",
                 }}
                 role="alert"

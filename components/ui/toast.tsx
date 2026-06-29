@@ -63,8 +63,8 @@ const ICONS: Record<ToastVariant, React.ReactNode> = {
 };
 
 const COLORS: Record<ToastVariant, { border: string; icon: string }> = {
-  success: { border: "rgba(55,201,126,0.35)",  icon: "var(--color-success)" },
-  error:   { border: "rgba(236,100,128,0.35)", icon: "var(--color-danger)" },
+  success: { border: "rgba(143,170,126,0.35)",  icon: "var(--color-success)" },
+  error:   { border: "rgba(207,139,136,0.35)", icon: "var(--color-danger)" },
   info:    { border: "rgba(255,255,255,0.12)", icon: "var(--color-muted)" },
 };
 

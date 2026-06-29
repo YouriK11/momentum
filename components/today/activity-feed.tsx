@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const MONTHS = ["jan","fév","mar","avr","mai","juin","juil","août","sep","oct","nov","déc"];
 
 function scoreLabel(score: number) {
-  if (score >= 100) return "Journée parfaite";
+  if (score >= 100) return "Journée complète";
   if (score >= 80)  return "Belle journée";
   if (score >= 50)  return "Bonne journée";
   if (score > 0)    return "Journée tranquille";
@@ -14,10 +14,10 @@ function scoreLabel(score: number) {
 }
 
 function scoreAccent(score: number): string {
-  if (score >= 80) return "#37c97e";
-  if (score >= 50) return "#ffc24b";
-  if (score > 0)   return "#fc5200";
-  return "#8e8e9a";
+  if (score >= 80) return "#8faa7e";
+  if (score >= 50) return "#c4a882";
+  if (score > 0)   return "#cb8b6a";
+  return "#a89e8d";
 }
 
 type Day = { score_date: string; score: number; completed: number; planned: number };
@@ -63,28 +63,28 @@ export function ActivityFeed({ days }: { days: Day[] }) {
               className="flex items-center gap-4 px-5 py-4"
               style={{
                 background: perfect
-                  ? "linear-gradient(90deg, rgba(255,194,75,0.04) 0%, transparent 60%)"
+                  ? "linear-gradient(90deg, rgba(196,168,130,0.05) 0%, transparent 60%)"
                   : "transparent",
-                borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.055)",
+                borderBottom: isLast ? "none" : `1px solid var(--color-border)`,
               }}
             >
               {/* Date badge */}
               <div
                 className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-[13px]"
                 style={{
-                  background: perfect ? "rgba(255,194,75,0.12)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${perfect ? "rgba(255,194,75,0.25)" : "rgba(255,255,255,0.07)"}`,
+                  background: perfect ? "rgba(196,168,130,0.1)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${perfect ? "rgba(196,168,130,0.25)" : "rgba(255,255,255,0.07)"}`,
                 }}
               >
                 <span
-                  className="font-display text-[18px] font-extrabold leading-none"
-                  style={{ color: perfect ? "#ffc24b" : "var(--color-foreground)" }}
+                  className="text-[18px] font-semibold leading-none"
+                  style={{ color: perfect ? "#c4a882" : "var(--color-foreground)" }}
                 >
                   {dt.getDate()}
                 </span>
                 <span
-                  className="text-[8px] font-bold uppercase tracking-wide"
-                  style={{ color: perfect ? "rgba(255,194,75,0.7)" : "var(--color-muted)" }}
+                  className="text-[8px] font-semibold uppercase tracking-wide"
+                  style={{ color: perfect ? "rgba(196,168,130,0.7)" : "var(--color-muted)" }}
                 >
                   {MONTHS[dt.getMonth()]}
                 </span>
@@ -100,10 +100,10 @@ export function ActivityFeed({ days }: { days: Day[] }) {
                       whileInView={{ scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.055 + 0.2, type: "spring", stiffness: 400, damping: 18 }}
-                      className="rounded-[6px] px-1.5 py-0.5 text-[9px] font-black tracking-wide"
-                      style={{ background: "rgba(255,194,75,0.18)", color: "#ffc24b" }}
+                      className="rounded-[6px] px-1.5 py-0.5 text-[9px] font-semibold tracking-wide"
+                      style={{ background: "rgba(196,168,130,0.15)", color: "#c4a882" }}
                     >
-                      PARFAIT
+                      COMPLET
                     </motion.span>
                   )}
                 </div>
@@ -122,7 +122,7 @@ export function ActivityFeed({ days }: { days: Day[] }) {
                       height: "100%",
                       borderRadius: "9999px",
                       background: accent,
-                      boxShadow: `0 0 6px ${accent}80`,
+                      boxShadow: "none",
                     }}
                   />
                 </div>
@@ -135,7 +135,7 @@ export function ActivityFeed({ days }: { days: Day[] }) {
               {/* Score */}
               <div className="shrink-0 text-right">
                 <span
-                  className="font-display text-2xl font-black tabular-nums leading-none"
+                  className="text-2xl font-semibold tabular-nums leading-none"
                   style={{ color: accent }}
                 >
                   {d.score}

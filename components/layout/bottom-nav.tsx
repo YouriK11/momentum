@@ -24,7 +24,7 @@ export function BottomNav() {
               key={t.href}
               href={t.href}
               className={`flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition ${
-                active ? "text-orange-400" : "text-neutral-500 hover:text-neutral-300"
+                active ? "text-primary" : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
               <span className="text-lg">{t.icon}</span>

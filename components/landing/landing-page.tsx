@@ -72,11 +72,11 @@ function Navbar() {
         <Link href="/" className="flex items-center gap-2.5">
           <span
             className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary"
-            style={{ boxShadow: "0 0 18px rgba(252,82,0,0.55)" }}
+            style={{ boxShadow: "none" }}
           >
             <Flame size={16} className="text-white" />
           </span>
-          <span className="font-display text-base font-black tracking-tight">Momentum</span>
+          <span className="font-display text-base font-semibold tracking-tight">Momentum</span>
         </Link>
 
         <div className="flex items-center gap-3">
@@ -89,7 +89,7 @@ function Navbar() {
           <Link
             href="/signup"
             className="group flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
-            style={{ boxShadow: "0 0 24px rgba(252,82,0,0.4)" }}
+            style={{ boxShadow: "none" }}
           >
             Commencer
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
@@ -140,7 +140,7 @@ function HeroVisual() {
                 className={`flex aspect-square w-full max-w-9 items-center justify-center rounded-lg text-xs font-bold ${
                   DONE[i] ? "bg-primary text-white" : "bg-surface-2 text-muted/40"
                 }`}
-                style={DONE[i] ? { boxShadow: "0 0 10px rgba(252,82,0,0.5)" } : undefined}
+                style={DONE[i] ? { boxShadow: "none" } : undefined}
               >
                 {DONE[i] ? "✓" : ""}
               </div>
@@ -160,9 +160,9 @@ function HeroVisual() {
         >
           <p className="text-xs font-medium text-muted">Meilleure série</p>
           <p
-            className="mt-1 font-display text-3xl font-black"
+            className="mt-1 font-display text-3xl font-semibold"
             style={{
-              background: "linear-gradient(135deg, #fc5200, #ff8c42)",
+              background: "linear-gradient(135deg, #cb8b6a, #d4a080)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -184,7 +184,7 @@ function HeroVisual() {
         >
           <p className="text-xs font-medium text-muted">Groupe actif</p>
           <div className="mt-2 flex -space-x-2">
-            {(["#fc5200", "#37c97e", "#ffc24b", "#ec6480"] as const).map((bg, i) => (
+            {(["#cb8b6a", "#8faa7e", "#c4a882", "#cf8b88"] as const).map((bg, i) => (
               <span
                 key={i}
                 className="h-7 w-7 rounded-full border-2 border-surface"
@@ -222,7 +222,7 @@ function HeroVisual() {
       >
         <span
           className="h-1.5 w-1.5 rounded-full bg-success"
-          style={{ boxShadow: "0 0 6px #37c97e" }}
+          style={{ boxShadow: "none" }}
         />
         <span className="font-semibold text-success">+12 pts</span>
         <span className="text-muted">ce matin</span>
@@ -238,25 +238,25 @@ function Hero() {
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         {/* Orange glow — left/center */}
         <div
-          className="absolute -top-40 left-0 h-[800px] w-[800px] rounded-full opacity-[0.15]"
+          className="absolute -top-40 left-0 h-[800px] w-[800px] rounded-full opacity-[0.12]"
           style={{
-            background: "radial-gradient(circle, #fc5200 0%, transparent 70%)",
+            background: "radial-gradient(circle, #cb8b6a 0%, transparent 70%)",
             filter: "blur(120px)",
           }}
         />
         {/* Secondary orange — right */}
         <div
-          className="absolute bottom-0 right-0 h-[600px] w-[600px] translate-x-1/3 rounded-full opacity-[0.08]"
+          className="absolute bottom-0 right-0 h-[600px] w-[600px] translate-x-1/3 rounded-full opacity-[0.07]"
           style={{
-            background: "radial-gradient(circle, #fc5200 0%, transparent 70%)",
+            background: "radial-gradient(circle, #cb8b6a 0%, transparent 70%)",
             filter: "blur(100px)",
           }}
         />
         {/* Green accent — bottom left */}
         <div
-          className="absolute -bottom-20 left-1/4 h-[400px] w-[400px] rounded-full opacity-[0.07]"
+          className="absolute -bottom-20 left-1/4 h-[400px] w-[400px] rounded-full opacity-[0.06]"
           style={{
-            background: "radial-gradient(circle, #37c97e 0%, transparent 70%)",
+            background: "radial-gradient(circle, #8faa7e 0%, transparent 70%)",
             filter: "blur(120px)",
           }}
         />
@@ -272,7 +272,7 @@ function Hero() {
         {/* Subtle horizontal line at the bottom */}
         <div
           className="absolute bottom-0 inset-x-0 h-px"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(252,82,0,0.2), transparent)" }}
+          style={{ background: "linear-gradient(90deg, transparent, rgba(203,139,106,0.15), transparent)" }}
         />
       </div>
 
@@ -289,7 +289,7 @@ function Hero() {
           >
             <span
               className="h-1.5 w-1.5 rounded-full bg-success"
-              style={{ boxShadow: "0 0 6px #37c97e" }}
+              style={{ boxShadow: "none" }}
             />
             Défis de groupe disponibles
             <ChevronRight size={11} />
@@ -300,12 +300,12 @@ function Hero() {
             initial={{ opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.08, ease: EASE }}
-            className="font-display text-5xl font-black leading-[1.04] tracking-tight lg:text-6xl xl:text-7xl"
+            className="font-display text-5xl font-semibold leading-[1.04] tracking-tight lg:text-6xl xl:text-7xl"
           >
             Tes{" "}
             <span
               style={{
-                background: "linear-gradient(110deg, #fc5200 20%, #ff8c42 100%)",
+                background: "linear-gradient(110deg, #cb8b6a 20%, #d4a080 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -318,7 +318,7 @@ function Hero() {
             Ta{" "}
             <span
               style={{
-                background: "linear-gradient(110deg, #fc5200 20%, #ff8c42 100%)",
+                background: "linear-gradient(110deg, #cb8b6a 20%, #d4a080 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -348,7 +348,7 @@ function Hero() {
             <Link
               href="/signup"
               className="group inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-white transition-all hover:brightness-110"
-              style={{ boxShadow: "0 0 36px rgba(252,82,0,0.45)" }}
+              style={{ boxShadow: "none" }}
             >
               Commencer gratuitement
               <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
@@ -369,7 +369,7 @@ function Hero() {
             className="mt-8 flex items-center gap-3"
           >
             <div className="flex -space-x-2">
-              {(["#fc5200", "#37c97e", "#ffc24b", "#ec6480", "#a78bfa"] as const).map((bg, i) => (
+              {(["#cb8b6a", "#8faa7e", "#c4a882", "#cf8b88", "#a89e8d"] as const).map((bg, i) => (
                 <span
                   key={i}
                   className="h-7 w-7 rounded-full border-2 border-background"
@@ -411,7 +411,7 @@ function Stats() {
         {STATS.map((s, i) => (
           <motion.div key={i} variants={fadeUp}>
             <p
-              className="font-display text-3xl font-black tracking-tight md:text-4xl"
+              className="font-display text-3xl font-semibold tracking-tight md:text-4xl"
               style={{
                 background: "linear-gradient(135deg, #f6f6f7 30%, #a6a6b0)",
                 WebkitBackgroundClip: "text",
@@ -440,8 +440,8 @@ function StreakVisual() {
           className="aspect-square rounded-sm"
           style={{
             background:
-              v === 2 ? "#fc5200" : v === 1 ? "rgba(252,82,0,0.28)" : "rgba(255,255,255,0.05)",
-            boxShadow: v === 2 ? "0 0 6px rgba(252,82,0,0.4)" : undefined,
+              v === 2 ? "#cb8b6a" : v === 1 ? "rgba(203,139,106,0.28)" : "rgba(255,255,255,0.05)",
+            boxShadow: "none",
           }}
         />
       ))}
@@ -450,10 +450,10 @@ function StreakVisual() {
 }
 
 const GROUP_MEMBERS = [
-  { name: "Alex", score: 92, color: "#fc5200" },
-  { name: "Sam", score: 78, color: "#37c97e" },
-  { name: "Jules", score: 65, color: "#ffc24b" },
-  { name: "Mia", score: 45, color: "#ec6480" },
+  { name: "Alex", score: 92, color: "#cb8b6a" },
+  { name: "Sam", score: 78, color: "#8faa7e" },
+  { name: "Jules", score: 65, color: "#c4a882" },
+  { name: "Mia", score: 45, color: "#cf8b88" },
 ] as const;
 
 function GroupVisual() {
@@ -563,7 +563,7 @@ function Features() {
           </motion.span>
           <motion.h2
             variants={fadeUp}
-            className="font-display text-4xl font-black tracking-tight md:text-5xl"
+            className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
           >
             Tout ce dont tu as besoin
           </motion.h2>
@@ -578,21 +578,21 @@ function Features() {
             title="Habitudes"
             desc="Crée et suis tes habitudes quotidiennes avec un système de séries qui récompense ta régularité."
             visual={<StreakVisual />}
-            accentColor="#fc5200"
+            accentColor="#cb8b6a"
           />
           <FeatureCard
             icon={<Users size={22} className="text-success" />}
             title="Groupes"
             desc="Rejoins des groupes de challenge. La compétition saine comme moteur de ta progression."
             visual={<GroupVisual />}
-            accentColor="#37c97e"
+            accentColor="#8faa7e"
           />
           <FeatureCard
             icon={<Trophy size={22} className="text-warning" />}
             title="Trophées"
             desc="Débloque des achievements qui matérialisent ta progression. Chaque effort est récompensé."
             visual={<TrophyVisual />}
-            accentColor="#ffc24b"
+            accentColor="#c4a882"
           />
         </Reveal>
       </div>
@@ -632,7 +632,7 @@ function HowItWorks() {
           </motion.span>
           <motion.h2
             variants={fadeUp}
-            className="font-display text-4xl font-black tracking-tight md:text-5xl"
+            className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
           >
             Aussi simple que ça
           </motion.h2>
@@ -651,7 +651,7 @@ function HowItWorks() {
                   style={{ left: "calc(50% + 28px)", width: "calc(100% - 56px)" }}
                 />
               )}
-              <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 font-display text-sm font-black text-primary">
+              <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 font-display text-sm font-semibold text-primary">
                 {s.num}
               </span>
               <h3 className="font-display text-lg font-bold">{s.title}</h3>
@@ -673,7 +673,7 @@ function CTA() {
           variants={fadeUp}
           className="relative overflow-hidden rounded-3xl border border-primary/20 p-10 text-center md:p-14"
           style={{
-            background: "linear-gradient(135deg, rgba(252,82,0,0.12) 0%, rgba(24,22,28,0.8) 100%)",
+            background: "linear-gradient(135deg, rgba(203,139,106,0.1) 0%, rgba(22,20,15,0.85) 100%)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
           }}
@@ -681,13 +681,13 @@ function CTA() {
           <div
             className="pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.28]"
             style={{
-              background: "radial-gradient(circle, #fc5200 0%, transparent 70%)",
+              background: "radial-gradient(circle, #cb8b6a 0%, transparent 70%)",
               filter: "blur(60px)",
             }}
           />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
-          <h2 className="font-display text-4xl font-black tracking-tight md:text-5xl">
+          <h2 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">
             Prêt à devenir une légende ?
           </h2>
           <p className="mx-auto mt-4 max-w-md text-base text-muted">
@@ -697,7 +697,7 @@ function CTA() {
             <Link
               href="/signup"
               className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-bold text-white transition hover:brightness-110"
-              style={{ boxShadow: "0 0 40px rgba(252,82,0,0.5)" }}
+              style={{ boxShadow: "none" }}
             >
               Commencer gratuitement
               <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
@@ -728,7 +728,7 @@ function Footer() {
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary">
             <Flame size={12} className="text-white" />
           </span>
-          <span className="font-display font-black text-foreground">Momentum</span>
+          <span className="font-display font-semibold text-foreground">Momentum</span>
           <span className="ml-2 text-muted/50">© 2026</span>
         </div>
         <nav className="flex gap-6">

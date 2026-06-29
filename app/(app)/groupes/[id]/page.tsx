@@ -34,7 +34,7 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
     <main>
       <div className="mx-auto max-w-xl px-4 pb-24 pt-10">
         <header className="mb-6">
-          <h1 className="font-display text-2xl font-black">{group.name}</h1>
+          <h1 className="font-display text-2xl font-semibold">{group.name}</h1>
           {group.description && (
             <p className="mt-1 text-[14px] text-muted">{group.description}</p>
           )}

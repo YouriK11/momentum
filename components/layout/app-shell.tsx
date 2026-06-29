@@ -36,7 +36,7 @@ export function AppShell({
       <aside
         className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col p-3 md:flex"
         style={{
-          background: "rgba(10,10,12,0.92)",
+          background: "rgba(22,20,15,0.94)",
           backdropFilter: "blur(24px) saturate(160%)",
           borderRight: "1px solid rgba(255,255,255,0.055)",
         }}
@@ -47,11 +47,11 @@ export function AppShell({
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.93 }}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-primary"
-            style={{ boxShadow: "0 0 20px rgba(252,82,0,0.48), 0 2px 6px rgba(0,0,0,0.5)" }}
+            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}
           >
             <Flame size={16} className="text-white" />
           </motion.span>
-          <span className="font-display text-[15px] font-black tracking-tight">
+          <span className="text-[15px] font-semibold">
             Momentum
           </span>
         </Link>
@@ -74,8 +74,8 @@ export function AppShell({
                     layoutId="sidebar-active-bg"
                     className="absolute inset-0 rounded-[13px]"
                     style={{
-                      background: "rgba(252,82,0,0.09)",
-                      border: "1px solid rgba(252,82,0,0.15)",
+                      background: "rgba(203,139,106,0.09)",
+                      border: "1px solid rgba(203,139,106,0.15)",
                     }}
                     transition={{ type: "spring", stiffness: 380, damping: 34 }}
                   />
@@ -89,10 +89,7 @@ export function AppShell({
                   }
                   transition={{ duration: 0.16 }}
                   className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px]"
-                  style={active
-                    ? { boxShadow: "0 0 10px rgba(252,82,0,0.48)" }
-                    : undefined
-                  }
+                  style={active ? {} : undefined}
                 >
                   <Icon size={14} />
                 </motion.span>
@@ -104,7 +101,6 @@ export function AppShell({
                   <motion.span
                     layoutId="sidebar-dot"
                     className="relative z-10 h-1.5 w-1.5 rounded-full bg-primary"
-                    style={{ boxShadow: "0 0 6px rgba(252,82,0,0.9)" }}
                     transition={{ type: "spring", stiffness: 380, damping: 34 }}
                   />
                 )}
@@ -163,7 +159,7 @@ export function AppShell({
       >
         <div
           style={{
-            background: "rgba(7,7,9,0.9)",
+            background: "rgba(22,20,14,0.92)",
             backdropFilter: "blur(32px) saturate(180%)",
             borderTop: "1px solid rgba(255,255,255,0.07)",
             paddingBottom: "max(env(safe-area-inset-bottom), 4px)",
@@ -184,7 +180,7 @@ export function AppShell({
                     <motion.div
                       layoutId="mobile-nav-pill"
                       className="absolute inset-x-0.5 inset-y-0 rounded-2xl"
-                      style={{ background: "rgba(252,82,0,0.1)" }}
+                      style={{ background: "rgba(203,139,106,0.1)" }}
                       transition={{ type: "spring", stiffness: 380, damping: 34 }}
                     />
                   )}

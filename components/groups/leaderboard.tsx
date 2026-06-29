@@ -91,8 +91,8 @@ export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
             key={r.userId}
             className="flex items-center gap-3 rounded-xl border p-3"
             style={{
-              background: r.userId === meId ? "rgba(252,82,0,0.05)" : "var(--color-surface-2)",
-              borderColor: r.userId === meId ? "rgba(252,82,0,0.3)" : "var(--color-border)",
+              background: r.userId === meId ? "rgba(203,139,106,0.05)" : "var(--color-surface-2)",
+              borderColor: r.userId === meId ? "rgba(203,139,106,0.3)" : "var(--color-border)",
             }}
           >
             <span className="w-6 text-center text-sm text-muted">{r.rank}</span>

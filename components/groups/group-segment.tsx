@@ -10,22 +10,18 @@ import { Avatar } from "@/components/profile/avatar";
 export type SegRow = { userId: string; username: string; avatarUrl: string | null; value: number };
 
 // ── Top-3 styling ─────────────────────────────────────────────────────────────
-const RANK_ACCENT  = ["#ffc24b", "#a6a6b0", "#fc5200"] as const; // gold, silver, bronze
+const RANK_ACCENT  = ["#c4a882", "#a89e8d", "#cb8b6a"] as const;
 const RANK_BG      = [
-  "linear-gradient(135deg, rgba(255,194,75,0.09) 0%, transparent 65%)",
-  "linear-gradient(135deg, rgba(166,166,160,0.06) 0%, transparent 65%)",
-  "linear-gradient(135deg, rgba(252,82,0,0.06) 0%, transparent 65%)",
+  "linear-gradient(135deg, rgba(196,168,130,0.07) 0%, transparent 65%)",
+  "linear-gradient(135deg, rgba(168,158,141,0.05) 0%, transparent 65%)",
+  "linear-gradient(135deg, rgba(203,139,106,0.05) 0%, transparent 65%)",
 ];
 const RANK_BORDER  = [
-  "rgba(255,194,75,0.2)",
-  "rgba(166,166,160,0.1)",
-  "rgba(252,82,0,0.14)",
+  "rgba(196,168,130,0.18)",
+  "rgba(168,158,141,0.1)",
+  "rgba(203,139,106,0.12)",
 ];
-const RANK_GLOW    = [
-  "0 0 20px -4px rgba(255,194,75,0.22)",
-  "none",
-  "none",
-];
+const RANK_GLOW    = ["none", "none", "none"];
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 export function GroupSegment({ name, groupId, rows, meId }: {
@@ -74,8 +70,8 @@ export function GroupSegment({ name, groupId, rows, meId }: {
               }}
               style={{
                 backgroundImage: isTop3 ? RANK_BG[i] : undefined,
-                backgroundColor: isMe ? "rgba(252,82,0,0.05)" : "transparent",
-                borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.055)",
+                backgroundColor: isMe ? "rgba(203,139,106,0.04)" : "transparent",
+                borderBottom: isLast ? "none" : `1px solid var(--color-border)`,
                 boxShadow: isTop3 ? RANK_GLOW[i] : "none",
               }}
             >
@@ -92,15 +88,12 @@ export function GroupSegment({ name, groupId, rows, meId }: {
                     >
                       <Crown
                         size={18}
-                        style={{
-                          color: "#ffc24b",
-                          filter: "drop-shadow(0 0 7px rgba(255,194,75,0.9))",
-                        }}
+                        style={{ color: "#c4a882" }}
                       />
                     </motion.div>
                   ) : (
                     <span
-                      className="font-display text-base font-black"
+                      className="font-display text-base font-semibold"
                       style={{ color: isTop3 ? RANK_ACCENT[i] : "var(--color-muted)" }}
                     >
                       {i + 1}
@@ -114,11 +107,7 @@ export function GroupSegment({ name, groupId, rows, meId }: {
                   {i === 0 && (
                     <div
                       className="absolute -inset-[2px] rounded-full"
-                      style={{
-                        background: "transparent",
-                        boxShadow: "0 0 0 1.5px rgba(255,194,75,0.5), 0 0 10px rgba(255,194,75,0.3)",
-                        borderRadius: "50%",
-                      }}
+                      style={{ boxShadow: "0 0 0 1.5px rgba(196,168,130,0.35)", borderRadius: "50%" }}
                     />
                   )}
                 </div>
@@ -133,8 +122,9 @@ export function GroupSegment({ name, groupId, rows, meId }: {
                       {r.username}
                     </p>
                     {isMe && (
-                      <span className="shrink-0 rounded-[5px] px-1 py-px text-[9px] font-black text-primary"
-                        style={{ background: "rgba(252,82,0,0.12)" }}
+                      <span
+                        className="shrink-0 rounded-[5px] px-1 py-px text-[9px] font-medium"
+                        style={{ background: "rgba(203,139,106,0.1)", color: "var(--color-primary)" }}
                       >
                         toi
                       </span>
@@ -160,7 +150,7 @@ export function GroupSegment({ name, groupId, rows, meId }: {
                         background: isTop3
                           ? `linear-gradient(90deg, ${RANK_ACCENT[i]}aa, ${RANK_ACCENT[i]})`
                           : "var(--color-muted)",
-                        boxShadow: isTop3 ? `0 0 6px ${RANK_ACCENT[i]}70` : "none",
+                        boxShadow: "none",
                       }}
                     />
                   </div>
@@ -169,7 +159,7 @@ export function GroupSegment({ name, groupId, rows, meId }: {
                 {/* Score */}
                 <div className="shrink-0 text-right">
                   <span
-                    className="font-display text-[17px] font-black tabular-nums"
+                    className="font-display text-[17px] font-semibold tabular-nums"
                     style={{ color: isTop3 ? RANK_ACCENT[i] : "var(--color-muted)" }}
                   >
                     {r.value}
@@ -202,7 +192,7 @@ export function EmptyGroup() {
         >
           <div
             className="flex h-12 w-12 items-center justify-center rounded-[14px]"
-            style={{ background: "rgba(252,82,0,0.1)" }}
+            style={{ background: "rgba(203,139,106,0.08)" }}
           >
             <Users size={20} className="text-primary" />
           </div>

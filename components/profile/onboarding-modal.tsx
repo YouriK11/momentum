@@ -205,7 +205,7 @@ export function OnboardingModal({
               disabled={habitBusy}
               onClick={step === 3 ? createSelectedHabits : nextStep}
               className="flex items-center gap-2 rounded-[14px] px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
-              style={{ background: "var(--color-primary)", boxShadow: "0 0 20px rgba(252,82,0,0.35)" }}
+              style={{ background: "var(--color-primary)" }}
             >
               {step === 3
                 ? habitBusy
@@ -231,11 +231,11 @@ function AvatarStep({ userId, username, avatarUrl }: {
       <div className="text-center">
         <div
           className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-[14px]"
-          style={{ background: "rgba(252,82,0,0.12)", border: "1px solid rgba(252,82,0,0.2)" }}
+          style={{ background: "rgba(203,139,106,0.12)", border: "1px solid rgba(203,139,106,0.2)" }}
         >
           <Camera size={22} style={{ color: "var(--color-primary)" }} />
         </div>
-        <h2 className="font-display text-xl font-black">Photo de profil</h2>
+        <h2 className="font-display text-xl font-semibold">Photo de profil</h2>
         <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
           Mets un visage sur ton compte — c&apos;est plus sympa pour ton groupe.
         </p>
@@ -257,11 +257,11 @@ function GroupStep({ groupName, setGroupName, inviteCode, setInviteCode, busy, e
       <div>
         <div
           className="mb-4 flex h-12 w-12 items-center justify-center rounded-[14px]"
-          style={{ background: "rgba(55,201,126,0.12)", border: "1px solid rgba(55,201,126,0.2)" }}
+          style={{ background: "rgba(143,170,126,0.12)", border: "1px solid rgba(143,170,126,0.2)" }}
         >
           <Users size={22} style={{ color: "var(--color-success)" }} />
         </div>
-        <h2 className="font-display text-xl font-black">Rejoins ou crée un groupe</h2>
+        <h2 className="font-display text-xl font-semibold">Rejoins ou crée un groupe</h2>
         <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
           Progresse en équipe et compare ta constance à celle de tes amis.
         </p>
@@ -282,7 +282,7 @@ function GroupStep({ groupName, setGroupName, inviteCode, setInviteCode, busy, e
             onClick={onCreate}
             disabled={busy || !groupName.trim()}
             className="shrink-0 rounded-[13px] px-4 py-3 text-sm font-semibold transition-opacity disabled:opacity-40"
-            style={{ background: "rgba(252,82,0,0.12)", color: "var(--color-primary)", border: "1px solid rgba(252,82,0,0.2)" }}
+            style={{ background: "rgba(203,139,106,0.12)", color: "var(--color-primary)", border: "1px solid rgba(203,139,106,0.2)" }}
           >
             {busy ? "…" : "Créer"}
           </button>
@@ -314,7 +314,7 @@ function GroupStep({ groupName, setGroupName, inviteCode, setInviteCode, busy, e
             onClick={onJoin}
             disabled={busy || !inviteCode.trim()}
             className="shrink-0 rounded-[13px] px-4 py-3 text-sm font-semibold transition-opacity disabled:opacity-40"
-            style={{ background: "rgba(55,201,126,0.12)", color: "var(--color-success)", border: "1px solid rgba(55,201,126,0.2)" }}
+            style={{ background: "rgba(143,170,126,0.12)", color: "var(--color-success)", border: "1px solid rgba(143,170,126,0.2)" }}
           >
             {busy ? "…" : "Rejoindre"}
           </button>
@@ -323,7 +323,7 @@ function GroupStep({ groupName, setGroupName, inviteCode, setInviteCode, busy, e
         {error && (
           <p
             className="rounded-[10px] px-4 py-3 text-sm"
-            style={{ background: "rgba(236,100,128,0.12)", color: "#ec6480", border: "1px solid rgba(236,100,128,0.2)" }}
+            style={{ background: "rgba(207,139,136,0.12)", color: "var(--color-danger)", border: "1px solid rgba(207,139,136,0.2)" }}
           >
             {error}
           </p>
@@ -340,11 +340,11 @@ function HabitsStep({ selected, onToggle }: { selected: Set<number>; onToggle: (
       <div>
         <div
           className="mb-4 flex h-12 w-12 items-center justify-center rounded-[14px]"
-          style={{ background: "rgba(252,82,0,0.12)", border: "1px solid rgba(252,82,0,0.2)" }}
+          style={{ background: "rgba(203,139,106,0.12)", border: "1px solid rgba(203,139,106,0.2)" }}
         >
           <ListChecks size={22} style={{ color: "var(--color-primary)" }} />
         </div>
-        <h2 className="font-display text-xl font-black">Tes premières habitudes</h2>
+        <h2 className="font-display text-xl font-semibold">Tes premières habitudes</h2>
         <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
           Sélectionne celles qui te parlent — tu pourras en ajouter d&apos;autres plus tard.
         </p>
@@ -360,8 +360,8 @@ function HabitsStep({ selected, onToggle }: { selected: Set<number>; onToggle: (
               onClick={() => onToggle(i)}
               className="flex items-center gap-4 rounded-[16px] border px-4 py-3.5 text-left"
               style={{
-                background:  isSelected ? "rgba(252,82,0,0.08)" : "var(--color-surface-2)",
-                borderColor: isSelected ? "rgba(252,82,0,0.28)" : "rgba(255,255,255,0.07)",
+                background:  isSelected ? "rgba(203,139,106,0.08)" : "var(--color-surface-2)",
+                borderColor: isSelected ? "rgba(203,139,106,0.28)" : "rgba(255,255,255,0.07)",
                 transition: "background 0.15s ease, border-color 0.15s ease",
               }}
             >

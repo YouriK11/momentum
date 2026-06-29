@@ -2,20 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 import type { Habit, HabitLevel, HabitFrequency } from "@/lib/types";
 import { createHabit, updateHabit } from "@/app/(app)/habits/actions";
 
-// ── Constants ──────────────────────────────────────────────────────────────────
-const DEFAULT_WEIGHT: Record<HabitLevel, number> = { facile: 1, moyen: 2, difficile: 3 };
 const ACCENT: Record<HabitLevel, string> = {
-  facile: "#37c97e", moyen: "#ffc24b", difficile: "#ec6480",
+  facile: "#8faa7e", moyen: "#c4a882", difficile: "#cf8b88",
 };
 const LEVEL_LABEL: Record<HabitLevel, string> = {
   facile: "Facile", moyen: "Moyen", difficile: "Difficile",
-};
-const FREQ_LABEL: Record<HabitFrequency, string> = {
-  daily: "Quotidien", specific_days: "Jours précis", x_per_week: "X / semaine",
 };
 const DAYS = [
   { value: 1, label: "Lun" }, { value: 2, label: "Mar" }, { value: 3, label: "Mer" },
@@ -23,8 +18,15 @@ const DAYS = [
   { value: 0, label: "Dim" },
 ] as const;
 const EMOJIS = ["🏃","📚","💧","🧘","🥗","😴","🎯","🧹","💪","✍️","🎸","🚭","🛁","🏋️","🧠","🌿","☀️","🥦"];
+const TEMPLATES = [
+  { icon: "💧", name: "Hydratation" },
+  { icon: "📚", name: "Lecture" },
+  { icon: "🏃", name: "Course" },
+  { icon: "🧘", name: "Méditation" },
+  { icon: "😴", name: "Sommeil" },
+  { icon: "✍️", name: "Écriture" },
+];
 
-// ── Props ──────────────────────────────────────────────────────────────────────
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -34,49 +36,47 @@ interface Props {
   habitToEdit?: Habit;
 }
 
-// ── Main ───────────────────────────────────────────────────────────────────────
 export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitToEdit }: Props) {
   const isEdit = Boolean(habitToEdit);
 
   const [name,        setName]        = useState("");
   const [description, setDescription] = useState("");
-  const [icon,        setIcon]        = useState("🎯");
+  const [icon,        setIcon]        = useState("🌱");
   const [level,       setLevel]       = useState<HabitLevel>("moyen");
-  const [weight,      setWeight]      = useState(2);
   const [target,      setTarget]      = useState("perso");
   const [frequency,   setFrequency]   = useState<HabitFrequency>("daily");
   const [freqDays,    setFreqDays]    = useState<number[]>([]);
-  const [freqX,       setFreqX]       = useState(3);
+  const [showMore,    setShowMore]    = useState(false);
   const [busy,        setBusy]        = useState(false);
   const [error,       setError]       = useState<string | null>(null);
 
-  // Sync fields when switching between habits (or opening for create)
   useEffect(() => {
     if (habitToEdit) {
       setName(habitToEdit.name);
       setDescription(habitToEdit.description ?? "");
-      setIcon(habitToEdit.icon ?? "🎯");
+      setIcon(habitToEdit.icon ?? "🌱");
       setLevel(habitToEdit.level);
-      setWeight(habitToEdit.weight);
       setTarget(habitToEdit.group_id ?? "perso");
-      setFrequency(habitToEdit.frequency ?? "daily");
+      const freq = habitToEdit.frequency ?? "daily";
+      setFrequency(freq === "x_per_week" ? "daily" : freq);
       setFreqDays(habitToEdit.frequency_days ?? []);
-      setFreqX(habitToEdit.frequency_x ?? 3);
+      const hasExtra = !!(habitToEdit.description || habitToEdit.level !== "moyen" || habitToEdit.frequency !== "daily" || habitToEdit.group_id);
+      setShowMore(hasExtra);
     } else {
-      setName(""); setDescription(""); setIcon("🎯"); setLevel("moyen");
-      setWeight(2); setTarget("perso"); setFrequency("daily");
-      setFreqDays([]); setFreqX(3);
+      setName(""); setDescription(""); setIcon("🌱"); setLevel("moyen");
+      setTarget("perso"); setFrequency("daily"); setFreqDays([]); setShowMore(false);
     }
     setError(null);
   }, [habitToEdit, isOpen]);
-
-  function pickLevel(l: HabitLevel) { setLevel(l); setWeight(DEFAULT_WEIGHT[l]); }
 
   function toggleDay(v: number) {
     setFreqDays((prev) => prev.includes(v) ? prev.filter((d) => d !== v) : [...prev, v]);
   }
 
-  function handleClose() { onClose(); }
+  function applyTemplate(t: { icon: string; name: string }) {
+    setIcon(t.icon);
+    setName(t.name);
+  }
 
   async function submit() {
     if (!name.trim()) { setError("Donne un nom à l'habitude."); return; }
@@ -90,12 +90,12 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
       description:   description.trim() || null,
       icon,
       level,
-      weight,
+      weight:        1,
       scope:         (target === "perso" ? "perso" : "commune") as "perso" | "commune",
       groupId:       target === "perso" ? null : target,
       frequency,
       frequencyDays: frequency === "specific_days" ? freqDays : null,
-      frequencyX:    frequency === "x_per_week" ? freqX : null,
+      frequencyX:    null,
     };
 
     const result = isEdit && habitToEdit
@@ -116,7 +116,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
             transition={{ duration: 0.22 }}
             className="fixed inset-0 z-40 bg-black/65"
             style={{ backdropFilter: "blur(4px)" }}
-            onClick={handleClose}
+            onClick={onClose}
           />
 
           <motion.div
@@ -129,30 +129,30 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
             style={{
               maxHeight: "92dvh",
               background: "var(--color-surface)",
-              backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.035) 0%, transparent 40%)",
-              borderTop: "1px solid rgba(255,255,255,0.1)",
-              boxShadow: "0 -32px 96px -8px rgba(0,0,0,0.85)",
+              backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.025) 0%, transparent 40%)",
+              borderTop: "1px solid var(--color-border)",
+              boxShadow: "0 -24px 72px -8px rgba(0,0,0,0.7)",
               paddingBottom: "max(env(safe-area-inset-bottom), 28px)",
             }}
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-1">
-              <div className="h-1 w-10 rounded-full bg-border" />
+              <div className="h-1 w-10 rounded-full" style={{ background: "var(--color-border)" }} />
             </div>
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 pb-5 pt-3">
               <div>
-                <h2 id="habit-sheet-title" className="font-display text-xl font-black">
+                <h2 id="habit-sheet-title" className="text-xl font-semibold">
                   {isEdit ? "Modifier l'habitude" : "Nouvelle habitude"}
                 </h2>
                 <p className="mt-0.5 text-xs text-muted">
-                  {isEdit ? "Ajuste les paramètres de cette habitude." : "Ça commence par un premier pas."}
+                  {isEdit ? "Ajuste les paramètres." : "Ça commence par un premier pas."}
                 </p>
               </div>
               <motion.button
                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
-                onClick={handleClose}
+                onClick={onClose}
                 aria-label="Fermer"
                 className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-foreground"
               >
@@ -160,42 +160,48 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
               </motion.button>
             </div>
 
-            {/* Form */}
             <div className="flex flex-col gap-5 px-5 pb-2">
 
-              {/* Name */}
-              <Field label="Nom">
-                <input
-                  value={name} onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex. Méditer 10 min"
-                  onKeyDown={(e) => e.key === "Enter" && submit()}
-                  className="w-full rounded-[13px] border px-4 py-3 text-sm outline-none focus:border-primary/50"
-                  style={{ background: "var(--color-surface-2)", borderColor: "rgba(255,255,255,0.07)", color: "var(--color-foreground)" }}
-                />
-              </Field>
+              {/* Suggestions — création seulement */}
+              {!isEdit && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Suggestions</p>
+                  <div className="flex flex-wrap gap-2">
+                    {TEMPLATES.map((t) => {
+                      const active = name === t.name && icon === t.icon;
+                      return (
+                        <motion.button
+                          key={t.name}
+                          type="button"
+                          onClick={() => applyTemplate(t)}
+                          whileTap={{ scale: 0.94 }}
+                          className="flex items-center gap-2 rounded-2xl border px-3 py-2 text-[13px] font-medium"
+                          style={{
+                            background:  active ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
+                            borderColor: active ? "rgba(203,139,106,0.3)" : "var(--color-border)",
+                            color:       active ? "var(--color-primary)"  : "var(--color-muted)",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          <span>{t.icon}</span>
+                          <span>{t.name}</span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-              {/* Description */}
-              <Field label="Description" hint="optionnel">
-                <input
-                  value={description} onChange={(e) => setDescription(e.target.value)}
-                  placeholder="En quoi ça consiste ?"
-                  className="w-full rounded-[13px] border px-4 py-3 text-sm outline-none focus:border-primary/50"
-                  style={{ background: "var(--color-surface-2)", borderColor: "rgba(255,255,255,0.07)", color: "var(--color-foreground)" }}
-                />
-              </Field>
-
-              {/* Icon picker */}
+              {/* Icône */}
               <Field label="Icône">
                 <div className="grid grid-cols-6 gap-2">
                   {EMOJIS.map((e) => (
                     <motion.button
                       key={e} type="button" onClick={() => setIcon(e)} whileTap={{ scale: 0.85 }}
-                      className="flex h-11 w-full items-center justify-center rounded-[10px] border text-xl transition-all"
+                      className="flex h-11 w-full items-center justify-center rounded-[10px] border text-xl"
                       style={{
-                        background:  icon === e ? "rgba(252,82,0,0.12)" : "var(--color-surface-2)",
-                        borderColor: icon === e ? "rgba(252,82,0,0.38)" : "rgba(255,255,255,0.05)",
-                        transform:   icon === e ? "scale(1.1)" : "scale(1)",
-                        boxShadow:   icon === e ? "0 0 12px rgba(252,82,0,0.25)" : "none",
+                        background:  icon === e ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
+                        borderColor: icon === e ? "rgba(203,139,106,0.35)" : "var(--color-border)",
                         transition: "all 0.15s ease",
                       }}
                     >{e}</motion.button>
@@ -203,154 +209,199 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
                 </div>
               </Field>
 
-              {/* Level */}
-              <Field label="Difficulté">
-                <div className="grid grid-cols-3 gap-2">
-                  {(["facile", "moyen", "difficile"] as HabitLevel[]).map((l) => {
-                    const c = ACCENT[l]; const active = level === l;
-                    return (
-                      <motion.button
-                        key={l} type="button" onClick={() => pickLevel(l)} whileTap={{ scale: 0.94 }}
-                        className="flex flex-col items-center gap-2 rounded-[13px] border py-3.5"
-                        style={{ background: active ? c + "18" : "var(--color-surface-2)", borderColor: active ? c + "45" : "rgba(255,255,255,0.06)" }}
-                      >
-                        <span className="h-2 w-2 rounded-full" style={{ background: active ? c : "rgba(255,255,255,0.18)" }} />
-                        <span className="text-[11px] font-semibold" style={{ color: active ? c : "var(--color-muted)" }}>
-                          {LEVEL_LABEL[l]}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </Field>
-
-              {/* Weight */}
-              <Field label="Poids dans le score" hint={<span className="font-bold" style={{ color: "var(--color-primary)" }}>{weight}</span>}>
+              {/* Nom */}
+              <Field label="Nom">
                 <input
-                  type="range" min={0.5} max={5} step={0.5}
-                  value={weight} onChange={(e) => setWeight(Number(e.target.value))}
-                  className="w-full accent-primary"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ex. Méditer 10 min"
+                  onKeyDown={(e) => e.key === "Enter" && submit()}
+                  className="w-full rounded-[13px] border px-4 py-3 text-sm outline-none"
+                  style={{
+                    background: "var(--color-surface-2)",
+                    borderColor: "var(--color-border)",
+                    color: "var(--color-foreground)",
+                    transition: "border-color 0.15s ease",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
+                  onBlur={(e)  => (e.target.style.borderColor = "var(--color-border)")}
                 />
-                <p className="text-[11px] text-muted">Plus le poids est élevé, plus cette habitude pèse dans ton score.</p>
               </Field>
 
-              {/* Fréquence */}
-              <Field label="Fréquence">
-                <div className="grid grid-cols-3 gap-2">
-                  {(["daily", "specific_days", "x_per_week"] as HabitFrequency[]).map((f) => {
-                    const active = frequency === f;
-                    return (
-                      <motion.button
-                        key={f} type="button" onClick={() => setFrequency(f)} whileTap={{ scale: 0.94 }}
-                        className="flex flex-col items-center gap-1.5 rounded-[13px] border px-2 py-3"
-                        style={{
-                          background:  active ? "rgba(252,82,0,0.12)" : "var(--color-surface-2)",
-                          borderColor: active ? "rgba(252,82,0,0.35)" : "rgba(255,255,255,0.06)",
-                        }}
-                      >
-                        <span className="h-2 w-2 rounded-full"
-                          style={{ background: active ? "var(--color-primary)" : "rgba(255,255,255,0.18)" }} />
-                        <span className="text-center text-[10px] font-semibold leading-tight"
-                          style={{ color: active ? "var(--color-primary)" : "var(--color-muted)" }}>
-                          {FREQ_LABEL[f]}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-                </div>
+              {/* Toggle "Plus d'options" */}
+              <button
+                type="button"
+                onClick={() => setShowMore((v) => !v)}
+                className="flex items-center gap-2 self-start text-[13px] font-medium text-muted transition-colors hover:text-foreground"
+              >
+                <motion.span animate={{ rotate: showMore ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown size={15} />
+                </motion.span>
+                {showMore ? "Moins d'options" : "Plus d'options"}
+              </button>
 
-                <AnimatePresence mode="wait">
-                  {frequency === "specific_days" && (
-                    <motion.div key="days"
-                      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.18 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-3 flex gap-1.5">
-                        {DAYS.map(({ value, label }) => {
-                          const sel = freqDays.includes(value);
+              <AnimatePresence initial={false}>
+                {showMore && (
+                  <motion.div
+                    key="more"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex flex-col gap-5 overflow-hidden"
+                  >
+                    {/* Description */}
+                    <Field label="Description" hint="optionnel">
+                      <input
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="En quoi ça consiste ?"
+                        className="w-full rounded-[13px] border px-4 py-3 text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface-2)",
+                          borderColor: "var(--color-border)",
+                          color: "var(--color-foreground)",
+                          transition: "border-color 0.15s ease",
+                        }}
+                        onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
+                        onBlur={(e)  => (e.target.style.borderColor = "var(--color-border)")}
+                      />
+                    </Field>
+
+                    {/* Difficulté */}
+                    <Field label="Difficulté">
+                      <div className="grid grid-cols-3 gap-2">
+                        {(["facile", "moyen", "difficile"] as HabitLevel[]).map((l) => {
+                          const c = ACCENT[l]; const active = level === l;
                           return (
-                            <button key={value} type="button" onClick={() => toggleDay(value)}
-                              className="flex h-9 flex-1 items-center justify-center rounded-[9px] text-[11px] font-bold"
+                            <motion.button
+                              key={l} type="button" onClick={() => setLevel(l)} whileTap={{ scale: 0.94 }}
+                              className="flex flex-col items-center gap-2 rounded-[13px] border py-3.5"
                               style={{
-                                background:  sel ? "rgba(252,82,0,0.15)" : "var(--color-surface-2)",
-                                borderWidth: 1, borderStyle: "solid",
-                                borderColor: sel ? "rgba(252,82,0,0.4)" : "rgba(255,255,255,0.06)",
-                                color:       sel ? "var(--color-primary)" : "var(--color-muted)",
+                                background:  active ? c + "18" : "var(--color-surface-2)",
+                                borderColor: active ? c + "45" : "var(--color-border)",
                               }}
-                            >{label}</button>
+                            >
+                              <span className="h-2 w-2 rounded-full"
+                                style={{ background: active ? c : "rgba(255,255,255,0.18)" }} />
+                              <span className="text-[11px] font-semibold"
+                                style={{ color: active ? c : "var(--color-muted)" }}>
+                                {LEVEL_LABEL[l]}
+                              </span>
+                            </motion.button>
                           );
                         })}
                       </div>
-                    </motion.div>
-                  )}
-                  {frequency === "x_per_week" && (
-                    <motion.div key="xperweek"
-                      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.18 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-3 flex items-center gap-3">
-                        <span className="text-[13px] text-muted">Combien de fois par semaine ?</span>
-                        <div className="ml-auto flex items-center gap-2">
-                          <button type="button" onClick={() => setFreqX((x) => Math.max(1, x - 1))}
-                            className="flex h-8 w-8 items-center justify-center rounded-[9px] font-bold text-muted hover:text-foreground"
-                            style={{ background: "var(--color-surface-2)" }}>−</button>
-                          <span className="w-6 text-center font-display font-black text-primary">{freqX}</span>
-                          <button type="button" onClick={() => setFreqX((x) => Math.min(7, x + 1))}
-                            className="flex h-8 w-8 items-center justify-center rounded-[9px] font-bold text-muted hover:text-foreground"
-                            style={{ background: "var(--color-surface-2)" }}>+</button>
-                        </div>
+                    </Field>
+
+                    {/* Fréquence */}
+                    <Field label="Fréquence">
+                      <div className="grid grid-cols-2 gap-2">
+                        {([
+                          { value: "daily",         label: "Chaque jour" },
+                          { value: "specific_days", label: "Jours précis" },
+                        ] as { value: HabitFrequency; label: string }[]).map(({ value: f, label }) => {
+                          const active = frequency === f;
+                          return (
+                            <motion.button
+                              key={f} type="button" onClick={() => setFrequency(f)} whileTap={{ scale: 0.94 }}
+                              className="flex items-center gap-2.5 rounded-[13px] border px-4 py-3"
+                              style={{
+                                background:  active ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
+                                borderColor: active ? "rgba(203,139,106,0.3)" : "var(--color-border)",
+                              }}
+                            >
+                              <span className="h-2 w-2 shrink-0 rounded-full"
+                                style={{ background: active ? "var(--color-primary)" : "rgba(255,255,255,0.18)" }} />
+                              <span className="text-[12px] font-semibold"
+                                style={{ color: active ? "var(--color-primary)" : "var(--color-muted)" }}>
+                                {label}
+                              </span>
+                            </motion.button>
+                          );
+                        })}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </Field>
 
-              {/* Scope */}
-              {groups.length > 0 && (
-                <Field label="Destination">
-                  <div className="flex flex-col gap-2">
-                    {[
-                      { value: "perso", label: "Perso (privé)" },
-                      ...groups.map((g) => ({ value: g.id, label: `Groupe · ${g.name}` })),
-                    ].map((opt) => {
-                      const active = target === opt.value;
-                      return (
-                        <motion.button
-                          key={opt.value} type="button" onClick={() => setTarget(opt.value)} whileTap={{ scale: 0.98 }}
-                          className="flex items-center gap-3 rounded-[13px] border px-4 py-3 text-left text-sm"
-                          style={{
-                            background:  active ? "rgba(252,82,0,0.08)" : "var(--color-surface-2)",
-                            borderColor: active ? "rgba(252,82,0,0.3)" : "rgba(255,255,255,0.06)",
-                            color:       active ? "var(--color-foreground)" : "var(--color-muted)",
-                          }}
-                        >
-                          <span className="h-2 w-2 shrink-0 rounded-full"
-                            style={{ background: active ? "var(--color-primary)" : "rgba(255,255,255,0.2)" }} />
-                          <span className="font-medium">{opt.label}</span>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </Field>
-              )}
+                      <AnimatePresence mode="wait">
+                        {frequency === "specific_days" && (
+                          <motion.div
+                            key="days"
+                            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.18 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="mt-3 flex gap-1.5">
+                              {DAYS.map(({ value, label }) => {
+                                const sel = freqDays.includes(value);
+                                return (
+                                  <button
+                                    key={value} type="button" onClick={() => toggleDay(value)}
+                                    className="flex h-9 flex-1 items-center justify-center rounded-[9px] border text-[11px] font-semibold"
+                                    style={{
+                                      background:  sel ? "rgba(203,139,106,0.12)" : "var(--color-surface-2)",
+                                      borderColor: sel ? "rgba(203,139,106,0.35)" : "var(--color-border)",
+                                      color:       sel ? "var(--color-primary)"   : "var(--color-muted)",
+                                    }}
+                                  >{label}</button>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Field>
 
-              {/* Error */}
+                    {/* Groupe */}
+                    {groups.length > 0 && (
+                      <Field label="Destination">
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "perso", label: "Perso (privé)" },
+                            ...groups.map((g) => ({ value: g.id, label: `Groupe · ${g.name}` })),
+                          ].map((opt) => {
+                            const active = target === opt.value;
+                            return (
+                              <motion.button
+                                key={opt.value} type="button" onClick={() => setTarget(opt.value)} whileTap={{ scale: 0.98 }}
+                                className="flex items-center gap-3 rounded-[13px] border px-4 py-3 text-left text-sm"
+                                style={{
+                                  background:  active ? "rgba(203,139,106,0.08)" : "var(--color-surface-2)",
+                                  borderColor: active ? "rgba(203,139,106,0.25)" : "var(--color-border)",
+                                  color:       active ? "var(--color-foreground)" : "var(--color-muted)",
+                                }}
+                              >
+                                <span className="h-2 w-2 shrink-0 rounded-full"
+                                  style={{ background: active ? "var(--color-primary)" : "rgba(255,255,255,0.2)" }} />
+                                <span className="font-medium">{opt.label}</span>
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+                      </Field>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Erreur */}
               {error && (
                 <motion.p
                   initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
                   className="rounded-[10px] px-4 py-3 text-sm font-medium"
-                  style={{ background: "rgba(236,100,128,0.12)", color: "#ec6480", border: "1px solid rgba(236,100,128,0.2)" }}
+                  style={{
+                    background: "rgba(207,139,136,0.1)",
+                    color:      "var(--color-danger)",
+                    border:     "1px solid rgba(207,139,136,0.2)",
+                  }}
                 >{error}</motion.p>
               )}
 
-              {/* Submit */}
+              {/* Soumettre */}
               <motion.button
-                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                 onClick={submit} disabled={busy}
-                className="w-full rounded-[14px] py-4 text-sm font-bold text-white disabled:opacity-60"
-                style={{ background: "var(--color-primary)", boxShadow: "0 0 24px rgba(252,82,0,0.35), 0 4px 12px rgba(252,82,0,0.25)" }}
+                className="w-full rounded-[14px] py-4 text-sm font-semibold disabled:opacity-60"
+                style={{ background: "var(--color-primary)", color: "var(--color-primary-foreground)" }}
               >
                 {busy
                   ? (isEdit ? "Enregistrement…" : "Création en cours…")

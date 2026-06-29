@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/toast";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const ACCENT: Record<HabitLevel, string> = {
-  facile: "#37c97e", moyen: "#ffc24b", difficile: "#ec6480",
+  facile: "#8faa7e", moyen: "#c4a882", difficile: "#cf8b88",
 };
 const LEVEL_LABEL: Record<HabitLevel, string> = {
   facile: "Facile", moyen: "Moyen", difficile: "Difficile",
@@ -61,11 +61,11 @@ export function HabitManager({ userId, habits, groups }: Props) {
           whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
           onClick={openCreate}
           className="flex w-full items-center justify-between rounded-[18px] border border-dashed px-6 py-5 text-left"
-          style={{ borderColor: "rgba(252,82,0,0.25)", background: "rgba(252,82,0,0.04)" }}
+          style={{ borderColor: "rgba(203,139,106,0.2)", background: "rgba(203,139,106,0.03)" }}
         >
           <span className="flex items-center gap-4">
             <span className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-primary"
-              style={{ boxShadow: "0 0 16px rgba(252,82,0,0.4)" }}>
+              style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>
               <Plus size={18} className="text-white" />
             </span>
             <div>
@@ -123,11 +123,11 @@ export function HabitManager({ userId, habits, groups }: Props) {
             className="card flex flex-col items-center gap-3 p-12 text-center"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl"
-              style={{ background: "rgba(252,82,0,0.1)" }}>
-              <span className="text-2xl">🎯</span>
+              style={{ background: "var(--color-surface-2)" }}>
+              <span className="text-2xl">🌱</span>
             </div>
             <div>
-              <p className="font-display font-bold">Lance-toi !</p>
+              <p className="font-semibold">Lance-toi !</p>
               <p className="mt-1 text-sm text-muted">Crée ta première habitude avec le bouton ci-dessus.</p>
             </div>
           </motion.div>
@@ -303,10 +303,8 @@ function HabitHeatmap({ dates }: { dates: string[] }) {
                     background: done
                       ? "var(--color-primary)"
                       : "rgba(255,255,255,0.05)",
-                    boxShadow: done
-                      ? isToday ? "0 0 8px rgba(252,82,0,0.7)" : "0 0 5px rgba(252,82,0,0.3)"
-                      : "none",
-                    outline: isToday ? "1px solid rgba(252,82,0,0.4)" : "none",
+                    boxShadow: "none",
+                    outline: isToday ? "1px solid rgba(203,139,106,0.4)" : "none",
                     outlineOffset: 1,
                   }}
                 />

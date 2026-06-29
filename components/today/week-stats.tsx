@@ -40,11 +40,11 @@ export function WeekStats({
 
   const isUp      = delta !== null && delta > 0;
   const isDown    = delta !== null && delta < 0;
-  const deltaColor = isUp ? "#37c97e" : isDown ? "#ec6480" : "#8e8e9a";
+  const deltaColor = isUp ? "#8faa7e" : isDown ? "#cf8b88" : "#a89e8d";
   const DeltaIcon  = isUp ? TrendingUp : isDown ? TrendingDown : Minus;
 
   const hasData = scoreAvg > 0 || delta !== null;
-  const zone    = !hasData ? "rgba(142,142,154,0.4)" : scoreAvg >= 80 ? "#37c97e" : scoreAvg >= 50 ? "#ffc24b" : "#ec6480";
+  const zone    = !hasData ? "rgba(168,158,141,0.4)" : scoreAvg >= 80 ? "#8faa7e" : scoreAvg >= 50 ? "#c4a882" : "#cf8b88";
 
   return (
     <div ref={containerRef} className="flex flex-col gap-4">
@@ -75,7 +75,7 @@ export function WeekStats({
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted">Score moyen</p>
             <div className="mt-1.5 flex items-baseline gap-1.5">
               <span
-                className="font-display font-black leading-none tabular-nums"
+                className="font-display font-semibold leading-none tabular-nums"
                 style={{ fontSize: "clamp(52px, 6vw, 72px)", color: zone, transition: "color 0.4s ease" }}
               >
                 <AnimatedNumber to={scoreAvg} trigger={inView} delay={0.12} />
@@ -131,7 +131,7 @@ export function WeekStats({
           value={activeDays}
           suffix="j"
           label="Jours actifs"
-          color="#fc5200"
+          color="#cb8b6a"
           trigger={inView}
           delay={0.18}
         />
@@ -140,7 +140,7 @@ export function WeekStats({
           value={bestStreak}
           suffix="j"
           label="Série record"
-          color="#37c97e"
+          color="#8faa7e"
           trigger={inView}
           delay={0.24}
         />
@@ -158,7 +158,7 @@ export function WeekStats({
             <DeltaIcon size={14} />
           </span>
           <div>
-            <p className="font-display text-3xl font-black leading-none tabular-nums" style={{ color: deltaColor }}>
+            <p className="font-display text-3xl font-semibold leading-none tabular-nums" style={{ color: deltaColor }}>
               {delta === null ? "—" : `${isUp ? "+" : ""}${delta}%`}
             </p>
             <p className="mt-1.5 text-[11px] leading-tight text-muted">vs sem. préc.</p>
@@ -193,7 +193,7 @@ function MiniStat({ icon, value, suffix, label, color, trigger, delay }: {
         {icon}
       </span>
       <div>
-        <p className="font-display text-3xl font-black leading-none tabular-nums">
+        <p className="font-display text-3xl font-semibold leading-none tabular-nums">
           <AnimatedNumber to={value} trigger={trigger} delay={delay + 0.12} />
           <span className="text-[13px] font-semibold text-muted">{suffix}</span>
         </p>

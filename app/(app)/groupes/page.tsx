@@ -18,7 +18,7 @@ export default async function GroupesPage() {
           Communauté
         </p>
         <h1
-          className="mt-1 font-display font-black tracking-tight"
+          className="mt-1 font-display font-semibold tracking-tight"
           style={{ fontSize: "clamp(32px, 3.5vw, 48px)", letterSpacing: "-0.03em" }}
         >
           Mes groupes

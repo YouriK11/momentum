@@ -51,21 +51,20 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
         <div
           className="card flex flex-col gap-6 p-8"
           style={{
-            backgroundImage: "linear-gradient(135deg, rgba(252,82,0,0.06) 0%, transparent 60%)",
+            backgroundImage: "linear-gradient(135deg, rgba(203,139,106,0.06) 0%, transparent 60%)",
           }}
         >
           <div>
             <div
               className="flex h-12 w-12 items-center justify-center rounded-[14px]"
               style={{
-                background: "rgba(252,82,0,0.12)",
-                border: "1px solid rgba(252,82,0,0.22)",
-                boxShadow: "0 0 18px rgba(252,82,0,0.15)",
+                background: "rgba(203,139,106,0.12)",
+                border: "1px solid rgba(203,139,106,0.22)",
               }}
             >
               <Plus size={22} style={{ color: "var(--color-primary)" }} />
             </div>
-            <h2 className="mt-4 font-display text-xl font-black tracking-tight">
+            <h2 className="mt-4 font-display text-xl font-semibold tracking-tight">
               Créer un groupe
             </h2>
             <p className="mt-1 text-[14px] leading-relaxed" style={{ color: "var(--color-muted)" }}>
@@ -78,7 +77,7 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createGroup()}
-              placeholder="Ex. Les warriors"
+              placeholder="Ex. Mes amis"
               className="auth-input"
             />
             <motion.button
@@ -101,20 +100,20 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
         <div
           className="card flex flex-col gap-6 p-8"
           style={{
-            backgroundImage: "linear-gradient(135deg, rgba(55,201,126,0.05) 0%, transparent 60%)",
+            backgroundImage: "linear-gradient(135deg, rgba(143,170,126,0.05) 0%, transparent 60%)",
           }}
         >
           <div>
             <div
               className="flex h-12 w-12 items-center justify-center rounded-[14px]"
               style={{
-                background: "rgba(55,201,126,0.12)",
-                border: "1px solid rgba(55,201,126,0.22)",
+                background: "rgba(143,170,126,0.12)",
+                border: "1px solid rgba(143,170,126,0.22)",
               }}
             >
               <Users size={22} style={{ color: "var(--color-success)" }} />
             </div>
-            <h2 className="mt-4 font-display text-xl font-black tracking-tight">
+            <h2 className="mt-4 font-display text-xl font-semibold tracking-tight">
               Rejoindre avec un code
             </h2>
             <p className="mt-1 text-[14px] leading-relaxed" style={{ color: "var(--color-muted)" }}>
@@ -137,8 +136,8 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
               disabled={busy}
               className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-[12px] text-[15px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-55"
               style={{
-                background: "rgba(55,201,126,0.1)",
-                border: "1px solid rgba(55,201,126,0.22)",
+                background: "rgba(143,170,126,0.1)",
+                border: "1px solid rgba(143,170,126,0.22)",
                 color: "var(--color-success)",
               }}
             >
@@ -158,8 +157,8 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
         <p
           className="rounded-[12px] px-5 py-3.5 text-[14px] font-medium"
           style={{
-            background: "rgba(236,100,128,0.1)",
-            border: "1px solid rgba(236,100,128,0.2)",
+            background: "rgba(207,139,136,0.1)",
+            border: "1px solid rgba(207,139,136,0.2)",
             color: "var(--color-danger)",
           }}
           role="alert"
@@ -175,8 +174,8 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
             Tes groupes
           </p>
           <span
-            className="rounded-[6px] px-2 py-0.5 text-[11px] font-black tabular-nums"
-            style={{ background: "rgba(252,82,0,0.12)", color: "var(--color-primary)" }}
+            className="rounded-[6px] px-2 py-0.5 text-[11px] font-semibold tabular-nums"
+            style={{ background: "rgba(203,139,106,0.12)", color: "var(--color-primary)" }}
           >
             {groups.length}
           </span>
@@ -196,10 +195,10 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
               >
                 {/* Group avatar */}
                 <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] font-display text-lg font-black"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] font-display text-lg font-semibold"
                   style={{
-                    background: "rgba(252,82,0,0.1)",
-                    border: "1px solid rgba(252,82,0,0.15)",
+                    background: "rgba(203,139,106,0.1)",
+                    border: "1px solid rgba(203,139,106,0.15)",
                     color: "var(--color-primary)",
                   }}
                 >
