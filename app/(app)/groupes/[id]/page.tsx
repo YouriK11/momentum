@@ -6,8 +6,8 @@ import { GroupActions, type GroupMember } from "@/components/group-actions";
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  const userId = session?.user?.id;
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id;
   if (!userId) redirect("/login");
 
   const today = new Date().toISOString().slice(0, 10);
