@@ -1,22 +1,20 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveHabits } from "@/lib/data/habits";
+import { getUserGroups } from "@/lib/data/groups";
 import { HabitManager } from "@/components/habit-manager";
 import type { Habit } from "@/lib/types";
 
 export default async function HabitsPage() {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  const userId = session?.user?.id;
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id;
   if (!userId) redirect("/login");
 
-  const { data: habits } = await supabase
-    .from("habits")
-    .select("id,name,description,icon,color,level,weight,scope,owner_id")
-    .eq("is_active", true)
-    .order("scope")
-    .order("name");
-
-  const { data: groups } = await supabase.from("groups").select("id,name").order("name");
+  const [{ data: habits }, { data: groups }] = await Promise.all([
+    getActiveHabits(supabase),   // pas de filtre date : gestion de toutes les habitudes
+    getUserGroups(supabase),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -34,7 +32,11 @@ export default async function HabitsPage() {
           Configure et organise tes habitudes personnelles et de groupe.
         </p>
       </header>
-      <HabitManager userId={userId} habits={(habits ?? []) as Habit[]} groups={groups ?? []} />
+      <HabitManager
+        userId={userId}
+        habits={(habits ?? []) as Habit[]}
+        groups={(groups ?? []).map((g) => ({ id: g.id, name: g.name }))}
+      />
     </div>
   );
 }

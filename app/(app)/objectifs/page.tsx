@@ -1,33 +1,34 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getUserGroups } from "@/lib/data/groups";
-import { GroupsPanel } from "@/components/groups-panel";
+import { getGoals } from "@/lib/data/goals";
+import { GoalsManager } from "@/components/goals-manager";
+import type { Goal } from "@/lib/types";
 
-export default async function GroupesPage() {
+export default async function ObjectifsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const userId = user?.id;
   if (!userId) redirect("/login");
 
-  const { data: groups } = await getUserGroups(supabase);
+  const { data: goals } = await getGoals(supabase, userId);
 
   return (
     <div className="flex flex-col gap-8">
       <header>
         <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
-          Communauté
+          Progression
         </p>
         <h1
           className="mt-1 font-display font-black tracking-tight"
           style={{ fontSize: "clamp(32px, 3.5vw, 48px)", letterSpacing: "-0.03em" }}
         >
-          Mes groupes
+          Mes objectifs
         </h1>
         <p className="mt-2 text-[15px] text-muted">
-          Crée un cercle ou rejoins celui d&apos;un ami.
+          Définis des cibles mesurables et suis ta progression.
         </p>
       </header>
-      <GroupsPanel groups={groups ?? []} />
+      <GoalsManager goals={(goals ?? []) as Goal[]} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getGroupById, getGroupLeaderboard } from "@/lib/data/groups";
 import { Leaderboard } from "@/components/leaderboard";
 import { GroupActions, type GroupMember } from "@/components/group-actions";
 
@@ -13,20 +14,17 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
   const today = new Date().toISOString().slice(0, 10);
 
   const [{ data: group }, { data: lb }] = await Promise.all([
-    supabase.from("groups").select("id,name,description,invite_code,owner_id").eq("id", id).single(),
-    supabase.rpc("group_leaderboard", { p_group: id, p_today: today }),
+    getGroupById(supabase, id),
+    getGroupLeaderboard(supabase, id, today),
   ]);
   if (!group) notFound();
 
-  const rows = (lb ?? []).map((r: {
-    user_id: string; username: string; avatar_url: string | null;
-    streak: number; today_score: number; week_score: number;
-  }) => ({
+  const rows = (lb ?? []).map((r) => ({
     userId: r.user_id, username: r.username, avatarUrl: r.avatar_url,
     streak: r.streak, today: r.today_score, weekAvg: r.week_score,
   }));
 
-  const members: GroupMember[] = rows.map((r: { userId: string; username: string; avatarUrl: string | null }) => ({
+  const members: GroupMember[] = rows.map((r) => ({
     userId: r.userId,
     username: r.username,
     avatarUrl: r.avatarUrl,
