@@ -38,3 +38,23 @@ export type Goal = {
   is_done: boolean;
   created_at: string;
 };
+
+export type ActivityEventType = "day_completed" | "streak_milestone" | "goal_achieved" | "badge_earned";
+export type ReactionType = "bravo" | "force" | "coeur" | "applaudir";
+
+export type ReactionWithReactor = {
+  id: string;
+  type: ReactionType;
+  reactor_id: string;
+  reactor: { username: string; avatar_url: string | null };
+};
+
+export type ActivityEvent = {
+  id: string;
+  user_id: string;
+  type: ActivityEventType;
+  payload: Record<string, unknown>;
+  occurred_on: string;
+  created_at: string;
+  reactions: ReactionWithReactor[];
+};

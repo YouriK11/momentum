@@ -130,6 +130,34 @@ export interface Database {
         Update: { title?: string; target_value?: number; current_value?: number; unit?: string | null; deadline?: string | null; is_done?: boolean };
         Relationships: [];
       };
+
+      activity_events: {
+        Row: { id: string; user_id: string; type: "day_completed" | "streak_milestone" | "goal_achieved" | "badge_earned"; payload: Record<string, unknown>; occurred_on: string; created_at: string };
+        Insert: { id?: string; user_id: string; type: "day_completed" | "streak_milestone" | "goal_achieved" | "badge_earned"; payload?: Record<string, unknown>; occurred_on?: string };
+        Update: never;
+        Relationships: [];
+      };
+
+      reactions: {
+        Row: { id: string; event_id: string; subject_user_id: string; reactor_id: string; type: "bravo" | "force" | "coeur" | "applaudir"; created_at: string };
+        Insert: { id?: string; event_id: string; subject_user_id: string; reactor_id: string; type: "bravo" | "force" | "coeur" | "applaudir" };
+        Update: { type?: "bravo" | "force" | "coeur" | "applaudir" };
+        Relationships: [];
+      };
+
+      notifications: {
+        Row: { id: string; user_id: string; type: "reaction" | "encouragement"; actor_id: string | null; event_id: string | null; payload: Record<string, unknown>; read: boolean; created_at: string };
+        Insert: { id?: string; user_id: string; type: "reaction" | "encouragement"; actor_id?: string | null; event_id?: string | null; payload?: Record<string, unknown>; read?: boolean };
+        Update: { read?: boolean };
+        Relationships: [];
+      };
+
+      encouragements: {
+        Row: { id: string; from_user: string; to_user: string; message: string | null; created_at: string };
+        Insert: { id?: string; from_user: string; to_user: string; message?: string | null };
+        Update: never;
+        Relationships: [];
+      };
     };
 
     Views: {
@@ -168,6 +196,10 @@ export interface Database {
       };
       leave_group: {
         Args: { p_group: string };
+        Returns: undefined;
+      };
+      emit_event: {
+        Args: { p_user: string; p_type: string; p_payload?: Record<string, unknown>; p_date?: string };
         Returns: undefined;
       };
     };
