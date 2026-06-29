@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Check, Flame, Trophy } from "lucide-react";
 import { motion, animate, useSpring } from "framer-motion";
 import type { Habit, HabitLevel } from "@/lib/types";
+import { useToast } from "@/components/ui/toast";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const ACCENT: Record<HabitLevel, string> = {
@@ -35,6 +36,7 @@ type Props = {
 // ── Main component ─────────────────────────────────────────────────────────────
 export function TodaySession({ userId, username, streak, bestStreak, habits, initialDone, today }: Props) {
   const supabase      = useMemo(() => createClient(), []);
+  const { toast }     = useToast();
   const [done, setDone] = useState<Set<string>>(new Set(initialDone));
   const prevScore     = useRef(-1);
   const burstTimer    = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -86,7 +88,10 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
         );
 
     req.then(({ error }) => {
-      if (error) setDone(prev => { const rb = new Set(prev); was ? rb.add(h.id) : rb.delete(h.id); return rb; });
+      if (error) {
+        setDone(prev => { const rb = new Set(prev); was ? rb.add(h.id) : rb.delete(h.id); return rb; });
+        toast("Erreur lors de l'enregistrement. Réessaie.", "error");
+      }
     });
   };
 

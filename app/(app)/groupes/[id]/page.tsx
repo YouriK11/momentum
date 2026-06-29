@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Leaderboard } from "@/components/leaderboard";
-import { GroupActions } from "@/components/group-actions";
+import { GroupActions, type GroupMember } from "@/components/group-actions";
 
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,22 +26,34 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
     streak: r.streak, today: r.today_score, weekAvg: r.week_score,
   }));
 
+  const members: GroupMember[] = rows.map((r: { userId: string; username: string; avatarUrl: string | null }) => ({
+    userId: r.userId,
+    username: r.username,
+    avatarUrl: r.avatarUrl,
+  }));
+
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100">
-      <div className="mx-auto max-w-2xl px-4 pb-24 pt-10">
+    <main>
+      <div className="mx-auto max-w-xl px-4 pb-24 pt-10">
         <header className="mb-6">
-          <h1 className="text-2xl font-semibold">{group.name}</h1>
-          {group.description && <p className="text-sm text-neutral-500">{group.description}</p>}
+          <h1 className="font-display text-2xl font-black">{group.name}</h1>
+          {group.description && (
+            <p className="mt-1 text-[14px] text-muted">{group.description}</p>
+          )}
         </header>
 
         <GroupActions
           groupId={group.id}
+          groupName={group.name}
           inviteCode={group.invite_code}
           isOwner={group.owner_id === userId}
-          memberCount={rows.length}
+          members={members}
+          meId={userId}
         />
 
-        <h2 className="mb-4 mt-10 text-sm font-medium text-neutral-400">Classement du groupe</h2>
+        <h2 className="mb-4 mt-10 text-[11px] font-semibold uppercase tracking-widest text-muted">
+          Classement du groupe
+        </h2>
         <Leaderboard rows={rows} meId={userId} />
       </div>
     </main>

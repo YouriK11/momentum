@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Plus, X, Archive, ChevronRight } from "lucide-react";
 import type { Habit, HabitLevel } from "@/lib/types";
 import { createHabit } from "@/app/(app)/habits/actions";
+import { useToast } from "@/components/ui/toast";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const DEFAULT_WEIGHT: Record<HabitLevel, number> = { facile: 1, moyen: 2, difficile: 3 };
@@ -27,14 +28,17 @@ type Props = {
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 export function HabitManager({ userId, habits, groups }: Props) {
-  const router   = useRouter();
-  const supabase = useMemo(() => createClient(), []);
-  const [isOpen, setIsOpen]   = useState(false);
+  const router     = useRouter();
+  const supabase   = useMemo(() => createClient(), []);
+  const { toast }  = useToast();
+  const [isOpen, setIsOpen]       = useState(false);
   const [archiving, setArchiving] = useState<string | null>(null);
 
   async function archive(id: string) {
     setArchiving(id);
-    await supabase.from("habits").update({ is_active: false }).eq("id", id);
+    const { error } = await supabase.from("habits").update({ is_active: false }).eq("id", id);
+    setArchiving(null);
+    if (error) { toast("Impossible d'archiver cette habitude.", "error"); return; }
     router.refresh();
   }
 
