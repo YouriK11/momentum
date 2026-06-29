@@ -736,7 +736,6 @@ function Footer() {
             [
               ["Connexion", "/login"],
               ["Inscription", "/signup"],
-              ["Classement", "/classement"],
             ] as const
           ).map(([label, href]) => (
             <Link key={href} href={href} className="transition-colors hover:text-foreground">
