@@ -9,6 +9,7 @@ import { WeekStats } from "@/components/week-stats";
 import { ActivityFeed } from "@/components/activity-feed";
 import { GroupSegment, EmptyGroup, type SegRow } from "@/components/group-segment";
 import { Rewards } from "@/components/rewards";
+import { OnboardingModal } from "@/components/onboarding-modal";
 import type { Habit, Badge } from "@/lib/types";
 
 export default async function HomePage() {
@@ -61,7 +62,17 @@ export default async function HomePage() {
   const badges  = (badgeRows ?? []).map((r) => (r as unknown as { badge: Badge }).badge).filter(Boolean);
   const doneIds = (logs ?? []).filter((l) => l.status).map((l) => l.habit_id);
 
+  const showOnboarding = !profile?.onboarded && (habits ?? []).length === 0 && !firstGroup;
+
   return (
+    <>
+    {showOnboarding && (
+      <OnboardingModal
+        userId={userId}
+        username={profile?.username ?? "toi"}
+        avatarUrl={profile?.avatar_url ?? null}
+      />
+    )}
     <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
 
       {/* ── Left: session du jour ──────────────────────────────────────────────── */}
@@ -90,5 +101,6 @@ export default async function HomePage() {
         <Rewards badges={badges} />
       </aside>
     </div>
+    </>
   );
 }

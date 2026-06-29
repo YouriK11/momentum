@@ -14,9 +14,10 @@ export interface Database {
           avatar_url: string | null;
           current_streak: number;
           best_streak: number;
+          onboarded: boolean;
         };
-        Insert: { id: string; username?: string; avatar_url?: string | null; current_streak?: number; best_streak?: number };
-        Update: { username?: string; avatar_url?: string | null; current_streak?: number; best_streak?: number };
+        Insert: { id: string; username?: string; avatar_url?: string | null; current_streak?: number; best_streak?: number; onboarded?: boolean };
+        Update: { username?: string; avatar_url?: string | null; current_streak?: number; best_streak?: number; onboarded?: boolean };
         Relationships: [];
       };
 

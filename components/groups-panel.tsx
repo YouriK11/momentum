@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, Users, ChevronRight, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useToast } from "@/components/ui/toast";
 
 type Group = { id: string; name: string; description: string | null };
 
 export function GroupsPanel({ groups }: { groups: Group[] }) {
   const router   = useRouter();
   const supabase = createClient();
+  const { toast } = useToast();
   const [name,  setName]  = useState("");
   const [code,  setCode]  = useState("");
   const [busy,  setBusy]  = useState(false);
@@ -23,7 +25,8 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
     setError(null);
     const { data, error } = await supabase.rpc("create_group", { p_name: name.trim() });
     setBusy(false);
-    if (error) return setError(error.message);
+    if (error) { setError(error.message); return; }
+    toast("Groupe créé !", "success");
     router.push(`/groupes/${data}`);
   }
 
@@ -33,7 +36,8 @@ export function GroupsPanel({ groups }: { groups: Group[] }) {
     setError(null);
     const { data, error } = await supabase.rpc("join_group_by_code", { p_code: code.trim() });
     setBusy(false);
-    if (error) return setError(error.message);
+    if (error) { setError(error.message); return; }
+    toast("Groupe rejoint !", "success");
     router.push(`/groupes/${data}`);
   }
 

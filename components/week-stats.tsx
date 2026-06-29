@@ -43,8 +43,8 @@ export function WeekStats({
   const deltaColor = isUp ? "#37c97e" : isDown ? "#ec6480" : "#8e8e9a";
   const DeltaIcon  = isUp ? TrendingUp : isDown ? TrendingDown : Minus;
 
-  // Score zone color
-  const zone = scoreAvg >= 80 ? "#37c97e" : scoreAvg >= 50 ? "#ffc24b" : "#ec6480";
+  const hasData = scoreAvg > 0 || delta !== null;
+  const zone    = !hasData ? "rgba(142,142,154,0.4)" : scoreAvg >= 80 ? "#37c97e" : scoreAvg >= 50 ? "#ffc24b" : "#ec6480";
 
   return (
     <div ref={containerRef} className="flex flex-col gap-4">

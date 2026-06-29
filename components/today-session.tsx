@@ -42,11 +42,12 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
   const burstTimer    = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // ── Derived ──────────────────────────────────────────────────────────────────
-  const total  = habits.reduce((a, h) => a + Number(h.weight), 0);
-  const earned = habits.filter((h) => done.has(h.id)).reduce((a, h) => a + Number(h.weight), 0);
-  const score  = total > 0 ? Math.round((earned / total) * 100) : 0;
-  const left   = habits.length - done.size;
-  const zone   = score >= 80 ? "#37c97e" : score >= 50 ? "#ffc24b" : "#ec6480";
+  const total   = habits.reduce((a, h) => a + Number(h.weight), 0);
+  const earned  = habits.filter((h) => done.has(h.id)).reduce((a, h) => a + Number(h.weight), 0);
+  const score   = total > 0 ? Math.round((earned / total) * 100) : 0;
+  const left    = habits.length - done.size;
+  const isEmpty = habits.length === 0;
+  const zone    = isEmpty ? "rgba(142,142,154,0.4)" : score >= 80 ? "#37c97e" : score >= 50 ? "#ffc24b" : "#ec6480";
 
   // ── Spring gauge ─────────────────────────────────────────────────────────────
   const springOffset = useSpring(CIRCUMFERENCE, { stiffness: 72, damping: 18, mass: 1.2 });
@@ -145,7 +146,7 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-              <AnimatedScore value={score} color={zone} />
+              <AnimatedScore value={score} color={zone} isEmpty={isEmpty} />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">score</span>
             </div>
           </div>
@@ -221,11 +222,12 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
 }
 
 // ── AnimatedScore ──────────────────────────────────────────────────────────────
-function AnimatedScore({ value, color }: { value: number; color: string }) {
+function AnimatedScore({ value, color, isEmpty }: { value: number; color: string; isEmpty?: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
 
   useEffect(() => {
+    if (isEmpty) return;
     const el = ref.current;
     if (!el || prev.current === value) { prev.current = value; return; }
     const from = prev.current;
@@ -236,7 +238,7 @@ function AnimatedScore({ value, color }: { value: number; color: string }) {
       onUpdate: (v) => { if (el) el.textContent = String(Math.round(v)); },
     });
     return ctrl.stop;
-  }, [value]);
+  }, [value, isEmpty]);
 
   return (
     <span
@@ -244,7 +246,7 @@ function AnimatedScore({ value, color }: { value: number; color: string }) {
       className="font-display font-black leading-none tabular-nums"
       style={{ fontSize: "clamp(44px, 5vw, 56px)", color, transition: "color 0.4s ease" }}
     >
-      {value}
+      {isEmpty ? "—" : value}
     </span>
   );
 }
