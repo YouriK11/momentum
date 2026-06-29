@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS public.activity_events (
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
--- Anti-doublon : même user, même type, même jour, même valeur de streak (ou '')
 CREATE UNIQUE INDEX IF NOT EXISTS activity_events_dedup
   ON public.activity_events (user_id, type, occurred_on, coalesce(payload->>'streak', ''));
 
@@ -72,7 +71,6 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
--- Anti-doublon pour éviter les notifications dupliquées sur une même réaction
 CREATE UNIQUE INDEX IF NOT EXISTS notifications_reaction_dedup
   ON public.notifications (user_id, actor_id, event_id)
   WHERE type = 'reaction' AND event_id IS NOT NULL;
@@ -112,8 +110,6 @@ CREATE POLICY "encouragements_select" ON public.encouragements
   FOR SELECT USING (from_user = auth.uid() OR to_user = auth.uid());
 
 -- ── emit_event ────────────────────────────────────────────────────────────────
--- Fonction SECURITY DEFINER : le seul point d'entrée pour créer des événements.
--- Idempotente grâce au ON CONFLICT DO NOTHING sur l'index unique.
 CREATE OR REPLACE FUNCTION public.emit_event(
   p_user    uuid,
   p_type    text,
@@ -168,7 +164,6 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Ne s'active qu'en cas de progression de la série
   IF NEW.current_streak <= COALESCE(OLD.current_streak, 0) THEN
     RETURN NEW;
   END IF;
@@ -190,7 +185,6 @@ CREATE TRIGGER profiles_streak_milestone
   FOR EACH ROW EXECUTE FUNCTION public.trg_streak_milestone();
 
 -- ── Trigger : day_completed ────────────────────────────────────────────────────
--- S'active sur INSERT ou UPDATE de daily_scores.
 CREATE OR REPLACE FUNCTION public.trg_day_completed()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -198,7 +192,6 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Journée bouclée : score >= 80 OU toutes les habitudes prévues faites
   IF NEW.score >= 80 OR (NEW.planned > 0 AND NEW.completed >= NEW.planned) THEN
     PERFORM public.emit_event(
       NEW.user_id,
@@ -224,8 +217,8 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Transition false → true uniquement
-  IF NEW.is_done = true AND (OLD.is_done IS NULL OR OLD.is_done = false) THEN
+  -- Transition false → true uniquement (colonne réelle : is_achieved)
+  IF NEW.is_achieved = true AND (OLD.is_achieved IS NULL OR OLD.is_achieved = false) THEN
     PERFORM public.emit_event(
       NEW.user_id,
       'goal_achieved',
@@ -239,7 +232,7 @@ $$;
 
 DROP TRIGGER IF EXISTS goals_goal_achieved ON public.goals;
 CREATE TRIGGER goals_goal_achieved
-  AFTER UPDATE OF is_done ON public.goals
+  AFTER UPDATE OF is_achieved ON public.goals
   FOR EACH ROW EXECUTE FUNCTION public.trg_goal_achieved();
 
 -- ── Trigger : notification sur réaction ───────────────────────────────────────
@@ -250,7 +243,6 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Pas de notification auto-réaction (bloqué aussi par RLS)
   IF NEW.reactor_id = NEW.subject_user_id THEN
     RETURN NEW;
   END IF;

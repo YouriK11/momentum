@@ -3,8 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/data/profile";
 import { getActiveHabits, getTodayLogs } from "@/lib/data/habits";
 import { getScoresFrom } from "@/lib/data/scores";
+import { getFriendActivity } from "@/lib/data/social";
 import { TodaySession } from "@/components/today/today-session";
 import { ActivityFeed } from "@/components/today/activity-feed";
+import { FriendActivityBar } from "@/components/social/friend-activity-bar";
 import { OnboardingModal } from "@/components/profile/onboarding-modal";
 import type { Habit } from "@/lib/types";
 
@@ -22,11 +24,13 @@ export default async function HomePage() {
     { data: habits },
     { data: logs },
     { data: scores },
+    friendsActive,
   ] = await Promise.all([
     getProfile(supabase, userId),
     getActiveHabits(supabase, today),
     getTodayLogs(supabase, userId, today),
     getScoresFrom(supabase, userId, day7),
+    getFriendActivity(supabase, userId, today),
   ]);
 
   const doneIds = (logs ?? []).filter((l) => l.status).map((l) => l.habit_id);
@@ -51,6 +55,12 @@ export default async function HomePage() {
           initialDone={doneIds}
           today={today}
         />
+
+        {/* Social proof — only shows if friends are active */}
+        {friendsActive.length > 0 && (
+          <FriendActivityBar friends={friendsActive} currentUserId={userId} />
+        )}
+
         <ActivityFeed days={[...(scores ?? [])].reverse()} />
       </div>
     </>
