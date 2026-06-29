@@ -11,7 +11,8 @@ import { ActivityFeed } from "@/components/today/activity-feed";
 import { GroupSegment, EmptyGroup, type SegRow } from "@/components/groups/group-segment";
 import { Rewards } from "@/components/profile/rewards";
 import { OnboardingModal } from "@/components/profile/onboarding-modal";
-import { InsightCards, computeInsights } from "@/components/today/insights";
+import { InsightCards } from "@/components/today/insights";
+import { computeInsights } from "@/lib/insights";
 import type { Habit, Badge } from "@/lib/types";
 
 export default async function HomePage() {
