@@ -119,18 +119,16 @@ export interface Database {
           id: string;
           user_id: string;
           title: string;
-          target_value: number;
-          current_value: number;
-          unit: string | null;
-          deadline: string | null;
           is_done: boolean;
           created_at: string;
-          goal_type: "habit_frequency_week" | "habit_frequency_month" | "streak_target" | "active_days_month" | null;
+          goal_type: "count_week" | "count_month" | "streak" | "active_days_month" | null;
           habit_id: string | null;
-          target_count: number | null;
+          target: number;
+          start_date: string | null;
+          end_date: string | null;
         };
-        Insert: { id?: string; user_id: string; title: string; target_value?: number; current_value?: number; unit?: string | null; deadline?: string | null; is_done?: boolean; goal_type?: string | null; habit_id?: string | null; target_count?: number | null };
-        Update: { title?: string; target_value?: number; current_value?: number; unit?: string | null; deadline?: string | null; is_done?: boolean; goal_type?: string | null; habit_id?: string | null; target_count?: number | null };
+        Insert: { id?: string; user_id: string; title: string; is_done?: boolean; goal_type?: string | null; habit_id?: string | null; target?: number; start_date?: string | null; end_date?: string | null };
+        Update: { title?: string; is_done?: boolean; goal_type?: string | null; habit_id?: string | null; target?: number; start_date?: string | null; end_date?: string | null };
         Relationships: [];
       };
 

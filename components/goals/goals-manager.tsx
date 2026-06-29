@@ -18,7 +18,7 @@ const GOAL_TYPES: {
   periodLabel: string;
 }[] = [
   {
-    type: "habit_frequency_week",
+    type: "count_week",
     icon: <ListChecks size={18} />,
     label: "X fois cette semaine",
     description: "Faire une habitude un nombre de fois par semaine.",
@@ -27,7 +27,7 @@ const GOAL_TYPES: {
     periodLabel: "cette semaine",
   },
   {
-    type: "habit_frequency_month",
+    type: "count_month",
     icon: <CalendarDays size={18} />,
     label: "X fois ce mois",
     description: "Faire une habitude un nombre de fois dans le mois.",
@@ -36,7 +36,7 @@ const GOAL_TYPES: {
     periodLabel: "ce mois",
   },
   {
-    type: "streak_target",
+    type: "streak",
     icon: <Flame size={18} />,
     label: "Série de X jours",
     description: "Tenir une série active pendant X jours consécutifs.",
@@ -75,7 +75,7 @@ function GoalCard({
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
   const meta = GOAL_TYPE_META[goal.goal_type];
-  const pct = Math.min(100, Math.round((goal.progress / goal.target_count) * 100));
+  const pct = Math.min(100, Math.round((goal.progress / goal.target) * 100));
   const isComplete = pct >= 100;
 
   async function handleCelebrate() {
@@ -163,7 +163,7 @@ function GoalCard({
           <span className="font-semibold tabular-nums" style={{ color: "var(--color-foreground)" }}>
             {goal.progress}
           </span>
-          {" / "}{goal.target_count}{" "}
+          {" / "}{goal.target}{" "}
           <span style={{ color: "var(--color-muted)" }}>{meta.periodLabel}</span>
         </p>
 
@@ -239,25 +239,27 @@ function AddGoalSheet({
     setBusy(true); setError(null);
     const title = autoTitle();
     const { error: err } = await createGoalV2({
-      goalType:    selectedType,
-      habitId:     meta?.needsHabit ? habitId : null,
-      targetCount: n,
+      goalType: selectedType,
+      habitId:  meta?.needsHabit ? habitId : null,
+      target:   n,
       title,
     });
     setBusy(false);
     if (err) { setError(err); return; }
 
     onCreated({
-      id:          crypto.randomUUID(),
-      user_id:     "",
+      id:         crypto.randomUUID(),
+      user_id:    "",
       title,
-      goal_type:   selectedType,
-      habit_id:    meta?.needsHabit ? habitId : null,
-      target_count: n,
-      is_done:     false,
-      created_at:  new Date().toISOString(),
-      progress:    0,
-      habit_name:  habitName,
+      goal_type:  selectedType,
+      habit_id:   meta?.needsHabit ? habitId : null,
+      target:     n,
+      start_date: null,
+      end_date:   null,
+      is_done:    false,
+      created_at: new Date().toISOString(),
+      progress:   0,
+      habit_name: habitName,
     });
     toast("Intention créée.", "success");
     reset();
@@ -373,7 +375,7 @@ function AddGoalSheet({
                     min="1"
                     value={count}
                     onChange={(e) => setCount(e.target.value)}
-                    placeholder={selectedType === "active_days_month" ? "Ex. 20" : selectedType === "streak_target" ? "Ex. 30" : "Ex. 5"}
+                    placeholder={selectedType === "active_days_month" ? "Ex. 20" : selectedType === "streak" ? "Ex. 30" : "Ex. 5"}
                     className="w-full rounded-[13px] border px-4 py-3 text-[14px] outline-none focus:border-primary/50"
                     style={{
                       background: "var(--color-surface-2)",

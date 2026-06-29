@@ -39,7 +39,7 @@ export type Goal = {
   created_at: string;
 };
 
-export type GoalType = "habit_frequency_week" | "habit_frequency_month" | "streak_target" | "active_days_month";
+export type GoalType = "count_week" | "count_month" | "streak" | "active_days_month";
 
 export type GoalV2 = {
   id: string;
@@ -47,7 +47,9 @@ export type GoalV2 = {
   title: string;
   goal_type: GoalType;
   habit_id: string | null;
-  target_count: number;
+  target: number;
+  start_date: string | null;
+  end_date: string | null;
   is_done: boolean;
   created_at: string;
   progress: number;

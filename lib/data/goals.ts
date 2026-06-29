@@ -1,14 +1,15 @@
 import type { TypedDb } from "@/lib/database.types";
 import type { GoalType, GoalV2 } from "@/lib/types";
 
-// ── Fetch new-style goals with habit name ──────────────────────────────────────
 type RawGoalV2 = {
   id: string;
   user_id: string;
   title: string;
   goal_type: string;
   habit_id: string | null;
-  target_count: number | null;
+  target: number;
+  start_date: string | null;
+  end_date: string | null;
   is_done: boolean;
   created_at: string;
   habit: { name: string } | null;
@@ -17,7 +18,7 @@ type RawGoalV2 = {
 export async function getGoalsV2(db: TypedDb, userId: string): Promise<GoalV2[]> {
   const { data } = await (db
     .from("goals")
-    .select("id, user_id, title, goal_type, habit_id, target_count, is_done, created_at, habit:habits!habit_id (name)")
+    .select("id, user_id, title, goal_type, habit_id, target, start_date, end_date, is_done, created_at, habit:habits!habit_id (name)")
     .eq("user_id", userId)
     .not("goal_type", "is", null)
     .eq("is_done", false)
@@ -31,24 +32,25 @@ export async function getGoalsV2(db: TypedDb, userId: string): Promise<GoalV2[]>
     title: row.title,
     goal_type: row.goal_type as GoalType,
     habit_id: row.habit_id,
-    target_count: row.target_count ?? 1,
+    target: row.target ?? 1,
+    start_date: row.start_date,
+    end_date: row.end_date,
     is_done: row.is_done,
     created_at: row.created_at,
     habit_name: row.habit?.name ?? null,
-    progress: 0, // filled in by computeGoalProgress in the page RSC
+    progress: 0,
   }));
 }
 
-// ── Progress computation helpers ───────────────────────────────────────────────
-function getWeekStart(today: string): string {
+function fallbackWeekStart(today: string): string {
   const d = new Date(today);
-  const day = d.getDay(); // 0=Sun
+  const day = d.getDay();
   const diff = day === 0 ? 6 : day - 1;
   d.setDate(d.getDate() - diff);
   return d.toISOString().slice(0, 10);
 }
 
-function getMonthStart(today: string): string {
+function fallbackMonthStart(today: string): string {
   return today.slice(0, 7) + "-01";
 }
 
@@ -59,45 +61,45 @@ export async function computeGoalProgress(
   today: string,
   currentStreak: number,
 ): Promise<GoalV2[]> {
-  const weekStart  = getWeekStart(today);
-  const monthStart = getMonthStart(today);
-
   return Promise.all(
     goals.map(async (g) => {
       let progress = 0;
 
-      if (g.goal_type === "habit_frequency_week" && g.habit_id) {
+      if (g.goal_type === "count_week" && g.habit_id) {
+        const start = g.start_date ?? fallbackWeekStart(today);
         const { count } = await db
           .from("habit_logs")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId)
           .eq("habit_id", g.habit_id)
           .eq("status", true)
-          .gte("log_date", weekStart)
+          .gte("log_date", start)
           .lte("log_date", today);
         progress = count ?? 0;
 
-      } else if (g.goal_type === "habit_frequency_month" && g.habit_id) {
+      } else if (g.goal_type === "count_month" && g.habit_id) {
+        const start = g.start_date ?? fallbackMonthStart(today);
         const { count } = await db
           .from("habit_logs")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId)
           .eq("habit_id", g.habit_id)
           .eq("status", true)
-          .gte("log_date", monthStart)
+          .gte("log_date", start)
           .lte("log_date", today);
         progress = count ?? 0;
 
-      } else if (g.goal_type === "streak_target") {
+      } else if (g.goal_type === "streak") {
         progress = currentStreak;
 
       } else if (g.goal_type === "active_days_month") {
+        const start = g.start_date ?? fallbackMonthStart(today);
         const { count } = await db
           .from("daily_scores")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId)
           .gt("score", 0)
-          .gte("score_date", monthStart)
+          .gte("score_date", start)
           .lte("score_date", today);
         progress = count ?? 0;
       }
