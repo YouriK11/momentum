@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Archive, ChevronRight, Pencil, CalendarDays } from "lucide-react";
+import { Plus, Archive, ChevronRight, Pencil, CalendarDays, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Habit, HabitLevel, HabitFrequency } from "@/lib/types";
 import { archiveHabit } from "@/app/(app)/habits/actions";
@@ -151,11 +151,12 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
   habit: Habit; index: number; userId: string;
   isArchiving: boolean; onArchive: () => void; onEdit: () => void; canManage: boolean;
 }) {
-  const accent      = ACCENT[h.level];
-  const supabase    = useMemo(() => createClient(), []);
-  const [showHist,  setShowHist]  = useState(false);
-  const [histDates, setHistDates] = useState<string[]>([]);
-  const [histBusy,  setHistBusy]  = useState(false);
+  const accent         = ACCENT[h.level];
+  const supabase       = useMemo(() => createClient(), []);
+  const [showHist,     setShowHist]    = useState(false);
+  const [histDates,    setHistDates]   = useState<string[]>([]);
+  const [histBusy,     setHistBusy]    = useState(false);
+  const [confirmArch,  setConfirmArch] = useState(false);
 
   async function toggleHistory() {
     if (!showHist && histDates.length === 0) {
@@ -224,14 +225,51 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
                 <Pencil size={13} />
               </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
-                onClick={onArchive} disabled={isArchiving}
-                title="Archiver l'habitude"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted transition-colors hover:bg-danger/10 hover:text-danger disabled:opacity-40"
-              >
-                <Archive size={14} />
-              </motion.button>
+              {/* Archive with inline confirm */}
+              <AnimatePresence mode="wait">
+                {confirmArch ? (
+                  <motion.div
+                    key="confirm"
+                    initial={{ opacity: 0, scale: 0.88 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.88 }}
+                    transition={{ duration: 0.14 }}
+                    className="flex items-center gap-1"
+                  >
+                    <button
+                      onClick={() => { setConfirmArch(false); onArchive(); }}
+                      disabled={isArchiving}
+                      title="Confirmer l'archivage"
+                      className="flex h-7 items-center gap-1 rounded-[8px] px-2 text-[11px] font-semibold disabled:opacity-50"
+                      style={{ background: "rgba(207,139,136,0.15)", color: "var(--color-danger)" }}
+                    >
+                      <Check size={10} />
+                      Oui
+                    </button>
+                    <button
+                      onClick={() => setConfirmArch(false)}
+                      title="Annuler"
+                      className="flex h-7 w-7 items-center justify-center rounded-[8px] text-muted hover:text-foreground"
+                    >
+                      <X size={12} />
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.button
+                    key="archive"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
+                    onClick={() => setConfirmArch(true)}
+                    disabled={isArchiving}
+                    title="Archiver l'habitude"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted transition-colors hover:bg-danger/10 hover:text-danger disabled:opacity-40"
+                  >
+                    <Archive size={14} />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </>
           )}
         </div>

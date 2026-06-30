@@ -1,30 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronDown } from "lucide-react";
 import type { Habit, HabitLevel, HabitFrequency } from "@/lib/types";
 import { createHabit, updateHabit } from "@/app/(app)/habits/actions";
 
-const ACCENT: Record<HabitLevel, string> = {
-  facile: "#8faa7e", moyen: "#c4a882", difficile: "#cf8b88",
-};
-const LEVEL_LABEL: Record<HabitLevel, string> = {
-  facile: "Facile", moyen: "Moyen", difficile: "Difficile",
-};
 const DAYS = [
   { value: 1, label: "Lun" }, { value: 2, label: "Mar" }, { value: 3, label: "Mer" },
   { value: 4, label: "Jeu" }, { value: 5, label: "Ven" }, { value: 6, label: "Sam" },
   { value: 0, label: "Dim" },
 ] as const;
+
 const EMOJIS = ["🏃","📚","💧","🧘","🥗","😴","🎯","🧹","💪","✍️","🎸","🚭","🛁","🏋️","🧠","🌿","☀️","🥦"];
+
 const TEMPLATES = [
-  { icon: "💧", name: "Hydratation" },
-  { icon: "📚", name: "Lecture" },
-  { icon: "🏃", name: "Course" },
-  { icon: "🧘", name: "Méditation" },
-  { icon: "😴", name: "Sommeil" },
-  { icon: "✍️", name: "Écriture" },
+  { icon: "📚", name: "Lire" },
+  { icon: "🧘", name: "Méditer" },
+  { icon: "🚶", name: "Marcher" },
+  { icon: "💧", name: "Boire de l'eau" },
 ];
 
 interface Props {
@@ -38,16 +32,16 @@ interface Props {
 
 export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitToEdit }: Props) {
   const isEdit = Boolean(habitToEdit);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const [name,        setName]        = useState("");
   const [description, setDescription] = useState("");
   const [icon,        setIcon]        = useState("🌱");
   const [customEmoji, setCustomEmoji] = useState("");
-  const [level,       setLevel]       = useState<HabitLevel>("moyen");
   const [target,      setTarget]      = useState("perso");
   const [frequency,   setFrequency]   = useState<HabitFrequency>("daily");
   const [freqDays,    setFreqDays]    = useState<number[]>([]);
-  const [showMore,    setShowMore]    = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const [busy,        setBusy]        = useState(false);
   const [error,       setError]       = useState<string | null>(null);
 
@@ -56,19 +50,31 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
       setName(habitToEdit.name);
       setDescription(habitToEdit.description ?? "");
       setIcon(habitToEdit.icon ?? "🌱");
-      setLevel(habitToEdit.level);
+      setCustomEmoji("");
       setTarget(habitToEdit.group_id ?? "perso");
       const freq = habitToEdit.frequency ?? "daily";
       setFrequency(freq === "x_per_week" ? "daily" : freq);
       setFreqDays(habitToEdit.frequency_days ?? []);
-      const hasExtra = !!(habitToEdit.description || habitToEdit.level !== "moyen" || habitToEdit.frequency !== "daily" || habitToEdit.group_id);
-      setShowMore(hasExtra);
+      const hasExtra = !!(
+        habitToEdit.description ||
+        habitToEdit.frequency !== "daily" ||
+        habitToEdit.group_id
+      );
+      setShowOptions(hasExtra);
     } else {
-      setName(""); setDescription(""); setIcon("🌱"); setCustomEmoji(""); setLevel("moyen");
-      setTarget("perso"); setFrequency("daily"); setFreqDays([]); setShowMore(false);
+      setName(""); setDescription(""); setIcon("🌱"); setCustomEmoji("");
+      setTarget("perso"); setFrequency("daily"); setFreqDays([]); setShowOptions(false);
     }
     setError(null);
   }, [habitToEdit, isOpen]);
+
+  // Autofocus name on open
+  useEffect(() => {
+    if (isOpen) {
+      const t = setTimeout(() => nameRef.current?.focus(), 120);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen]);
 
   function toggleDay(v: number) {
     setFreqDays((prev) => prev.includes(v) ? prev.filter((d) => d !== v) : [...prev, v]);
@@ -76,7 +82,9 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
 
   function applyTemplate(t: { icon: string; name: string }) {
     setIcon(t.icon);
+    setCustomEmoji("");
     setName(t.name);
+    nameRef.current?.focus();
   }
 
   async function submit() {
@@ -90,7 +98,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
       name:          name.trim(),
       description:   description.trim() || null,
       icon,
-      level,
+      level:         "moyen" as HabitLevel,
       weight:        1,
       scope:         (target === "perso" ? "perso" : "commune") as "perso" | "commune",
       groupId:       target === "perso" ? null : target,
@@ -142,7 +150,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-5 pt-3">
+            <div className="flex items-center justify-between px-5 pb-4 pt-3">
               <div>
                 <h2 id="habit-sheet-title" className="text-xl font-semibold">
                   {isEdit ? "Modifier l'habitude" : "Nouvelle habitude"}
@@ -161,96 +169,19 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
               </motion.button>
             </div>
 
-            <div className="flex flex-col gap-5 px-5 pb-2">
+            <div className="flex flex-col gap-4 px-5 pb-2">
 
-              {/* Suggestions — création seulement */}
-              {!isEdit && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Suggestions</p>
-                  <div className="flex flex-wrap gap-2">
-                    {TEMPLATES.map((t) => {
-                      const active = name === t.name && icon === t.icon;
-                      return (
-                        <motion.button
-                          key={t.name}
-                          type="button"
-                          onClick={() => applyTemplate(t)}
-                          whileTap={{ scale: 0.94 }}
-                          className="flex items-center gap-2 rounded-2xl border px-3 py-2 text-[13px] font-medium"
-                          style={{
-                            background:  active ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
-                            borderColor: active ? "rgba(203,139,106,0.3)" : "var(--color-border)",
-                            color:       active ? "var(--color-primary)"  : "var(--color-muted)",
-                            transition: "all 0.15s ease",
-                          }}
-                        >
-                          <span>{t.icon}</span>
-                          <span>{t.name}</span>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Icône */}
-              <Field label="Icône">
-                <div className="grid grid-cols-6 gap-2">
-                  {EMOJIS.map((e) => (
-                    <motion.button
-                      key={e} type="button"
-                      onClick={() => { setIcon(e); setCustomEmoji(""); }}
-                      whileTap={{ scale: 0.85 }}
-                      className="flex h-11 w-full items-center justify-center rounded-[10px] border text-xl"
-                      style={{
-                        background:  icon === e && !customEmoji ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
-                        borderColor: icon === e && !customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)",
-                        transition: "all 0.15s ease",
-                      }}
-                    >{e}</motion.button>
-                  ))}
-                </div>
-
-                {/* Custom emoji */}
-                <div className="mt-2 flex items-center gap-3">
-                  <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-muted">Autre</span>
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      placeholder="Colle un emoji…"
-                      value={customEmoji}
-                      onChange={(e) => {
-                        const chars = [...e.target.value]; // Unicode-aware split
-                        if (chars.length > 0) {
-                          const first = chars[0];
-                          setCustomEmoji(first);
-                          setIcon(first);
-                        } else {
-                          setCustomEmoji("");
-                        }
-                      }}
-                      className="w-full rounded-[10px] border py-2 pl-3 pr-10 text-sm outline-none"
-                      style={{
-                        background: customEmoji ? "rgba(203,139,106,0.08)" : "var(--color-surface-2)",
-                        borderColor: customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)",
-                        color: "var(--color-foreground)",
-                        transition: "border-color 0.15s ease",
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
-                      onBlur={(e)  => (e.target.style.borderColor = customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)")}
-                    />
-                    {customEmoji && (
-                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xl">
-                        {customEmoji}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Field>
-
-              {/* Nom */}
-              <Field label="Nom">
+              {/* ── 1. Nom (autofocus) ── */}
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="habit-name"
+                  className="text-[11px] font-semibold uppercase tracking-wider text-muted"
+                >
+                  Nom de l&apos;habitude
+                </label>
                 <input
+                  id="habit-name"
+                  ref={nameRef}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex. Méditer 10 min"
@@ -265,30 +196,121 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
                   onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
                   onBlur={(e)  => (e.target.style.borderColor = "var(--color-border)")}
                 />
-              </Field>
+              </div>
 
-              {/* Toggle "Plus d'options" */}
+              {/* ── 2. Templates rapides — création seulement ── */}
+              {!isEdit && (
+                <div
+                  className="flex gap-2 overflow-x-auto pb-0.5"
+                  style={{ scrollbarWidth: "none" }}
+                >
+                  {TEMPLATES.map((t) => {
+                    const active = name === t.name && icon === t.icon;
+                    return (
+                      <motion.button
+                        key={t.name}
+                        type="button"
+                        onClick={() => applyTemplate(t)}
+                        whileTap={{ scale: 0.94 }}
+                        className="flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-1.5 text-[13px] font-medium"
+                        style={{
+                          background:  active ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
+                          borderColor: active ? "rgba(203,139,106,0.3)" : "var(--color-border)",
+                          color:       active ? "var(--color-primary)"  : "var(--color-muted)",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        <span>{t.icon}</span>
+                        <span>{t.name}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ── 3. Icône — ligne horizontale compacte ── */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
+                  Icône
+                </label>
+                <div
+                  className="flex gap-2 overflow-x-auto pb-0.5"
+                  style={{ scrollbarWidth: "none" }}
+                >
+                  {EMOJIS.map((e) => (
+                    <motion.button
+                      key={e}
+                      type="button"
+                      onClick={() => { setIcon(e); setCustomEmoji(""); }}
+                      whileTap={{ scale: 0.85 }}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border text-xl"
+                      style={{
+                        background:  icon === e && !customEmoji ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
+                        borderColor: icon === e && !customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)",
+                        transition: "all 0.15s ease",
+                      }}
+                    >{e}</motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Options toggle ── */}
               <button
                 type="button"
-                onClick={() => setShowMore((v) => !v)}
+                onClick={() => setShowOptions((v) => !v)}
                 className="flex items-center gap-2 self-start text-[13px] font-medium text-muted transition-colors hover:text-foreground"
               >
-                <motion.span animate={{ rotate: showMore ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                <motion.span animate={{ rotate: showOptions ? 180 : 0 }} transition={{ duration: 0.2 }}>
                   <ChevronDown size={15} />
                 </motion.span>
-                {showMore ? "Moins d'options" : "Plus d'options"}
+                {showOptions ? "Moins d'options" : "Options"}
               </button>
 
               <AnimatePresence initial={false}>
-                {showMore && (
+                {showOptions && (
                   <motion.div
-                    key="more"
+                    key="options"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className="flex flex-col gap-5 overflow-hidden"
                   >
+                    {/* Emoji personnalisé */}
+                    <Field label="Emoji personnalisé">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Colle un emoji…"
+                          value={customEmoji}
+                          onChange={(e) => {
+                            const chars = [...e.target.value]; // Unicode-aware split
+                            if (chars.length > 0) {
+                              const first = chars[0];
+                              setCustomEmoji(first);
+                              setIcon(first);
+                            } else {
+                              setCustomEmoji("");
+                            }
+                          }}
+                          className="w-full rounded-[10px] border py-2 pl-3 pr-10 text-sm outline-none"
+                          style={{
+                            background: customEmoji ? "rgba(203,139,106,0.08)" : "var(--color-surface-2)",
+                            borderColor: customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)",
+                            color: "var(--color-foreground)",
+                            transition: "border-color 0.15s ease",
+                          }}
+                          onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
+                          onBlur={(e)  => (e.target.style.borderColor = customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)")}
+                        />
+                        {customEmoji && (
+                          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xl">
+                            {customEmoji}
+                          </span>
+                        )}
+                      </div>
+                    </Field>
+
                     {/* Description */}
                     <Field label="Description" hint="optionnel">
                       <input
@@ -305,32 +327,6 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
                         onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
                         onBlur={(e)  => (e.target.style.borderColor = "var(--color-border)")}
                       />
-                    </Field>
-
-                    {/* Difficulté */}
-                    <Field label="Difficulté">
-                      <div className="grid grid-cols-3 gap-2">
-                        {(["facile", "moyen", "difficile"] as HabitLevel[]).map((l) => {
-                          const c = ACCENT[l]; const active = level === l;
-                          return (
-                            <motion.button
-                              key={l} type="button" onClick={() => setLevel(l)} whileTap={{ scale: 0.94 }}
-                              className="flex flex-col items-center gap-2 rounded-[13px] border py-3.5"
-                              style={{
-                                background:  active ? c + "18" : "var(--color-surface-2)",
-                                borderColor: active ? c + "45" : "var(--color-border)",
-                              }}
-                            >
-                              <span className="h-2 w-2 rounded-full"
-                                style={{ background: active ? c : "rgba(255,255,255,0.18)" }} />
-                              <span className="text-[11px] font-semibold"
-                                style={{ color: active ? c : "var(--color-muted)" }}>
-                                {LEVEL_LABEL[l]}
-                              </span>
-                            </motion.button>
-                          );
-                        })}
-                      </div>
                     </Field>
 
                     {/* Fréquence */}
@@ -390,7 +386,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
                       </AnimatePresence>
                     </Field>
 
-                    {/* Groupe */}
+                    {/* Destination */}
                     {groups.length > 0 && (
                       <Field label="Destination">
                         <div className="flex flex-col gap-2">
@@ -426,6 +422,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
               {error && (
                 <motion.p
                   initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                  role="alert"
                   className="rounded-[10px] px-4 py-3 text-sm font-medium"
                   style={{
                     background: "rgba(207,139,136,0.1)",

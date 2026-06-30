@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Flame, ListChecks, Target, CalendarDays, Trash2, PartyPopper } from "lucide-react";
+import { Plus, X, Flame, ListChecks, Target, CalendarDays, Trash2, PartyPopper, ChevronDown, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { createGoalV2, celebrateGoal, deleteGoal } from "@/app/(app)/objectifs/actions";
 import type { Habit, GoalType, GoalV2 } from "@/lib/types";
@@ -12,70 +12,47 @@ const GOAL_TYPES: {
   type: GoalType;
   icon: React.ReactNode;
   label: string;
-  description: string;
   needsHabit: boolean;
-  unitLabel: (n: number, habitName?: string | null) => string;
-  periodLabel: string;
+  defaultCount: number;
 }[] = [
-  {
-    type: "count_week",
-    icon: <ListChecks size={18} />,
-    label: "X fois cette semaine",
-    description: "Faire une habitude un nombre de fois par semaine.",
-    needsHabit: true,
-    unitLabel: (n, h) => `${h ?? "l'habitude"} ${n} fois cette semaine`,
-    periodLabel: "cette semaine",
-  },
-  {
-    type: "count_month",
-    icon: <CalendarDays size={18} />,
-    label: "X fois ce mois",
-    description: "Faire une habitude un nombre de fois dans le mois.",
-    needsHabit: true,
-    unitLabel: (n, h) => `${h ?? "l'habitude"} ${n} fois ce mois`,
-    periodLabel: "ce mois",
-  },
-  {
-    type: "streak",
-    icon: <Flame size={18} />,
-    label: "Série de X jours",
-    description: "Tenir une série active pendant X jours consécutifs.",
-    needsHabit: false,
-    unitLabel: (n) => `Tenir une série de ${n} jours`,
-    periodLabel: "consécutifs",
-  },
-  {
-    type: "active_days_month",
-    icon: <Target size={18} />,
-    label: "Actif X jours ce mois",
-    description: "Avoir un score positif au moins X jours dans le mois.",
-    needsHabit: false,
-    unitLabel: (n) => `Être actif ${n} jours ce mois`,
-    periodLabel: "ce mois",
-  },
+  { type: "count_week",        icon: <ListChecks size={14} />, label: "Cette semaine",  needsHabit: true,  defaultCount: 5  },
+  { type: "count_month",       icon: <CalendarDays size={14} />, label: "Ce mois",      needsHabit: true,  defaultCount: 15 },
+  { type: "streak",            icon: <Flame size={14} />,      label: "Série",          needsHabit: false, defaultCount: 30 },
+  { type: "active_days_month", icon: <Target size={14} />,     label: "Jours actifs",   needsHabit: false, defaultCount: 20 },
 ];
 
-const GOAL_TYPE_META = Object.fromEntries(GOAL_TYPES.map((g) => [g.type, g])) as Record<
-  GoalType,
-  typeof GOAL_TYPES[0]
->;
+const GOAL_META = Object.fromEntries(GOAL_TYPES.map((g) => [g.type, g])) as Record<GoalType, typeof GOAL_TYPES[0]>;
+
+function buildSentence(type: GoalType, count: number, habitName: string | null): string {
+  switch (type) {
+    case "count_week":        return `Faire ${habitName ?? "une habitude"} ${count} fois cette semaine`;
+    case "count_month":       return `Faire ${habitName ?? "une habitude"} ${count} fois ce mois`;
+    case "streak":            return `Atteindre ${count} jours de série consécutifs`;
+    case "active_days_month": return `Être actif ${count} jours ce mois`;
+  }
+}
+
+function buildTitle(type: GoalType, count: number, habitName: string | null): string {
+  switch (type) {
+    case "count_week":        return `${habitName ?? "l'habitude"} ${count} fois cette semaine`;
+    case "count_month":       return `${habitName ?? "l'habitude"} ${count} fois ce mois`;
+    case "streak":            return `Tenir une série de ${count} jours`;
+    case "active_days_month": return `Être actif ${count} jours ce mois`;
+  }
+}
 
 // ── GoalCard ──────────────────────────────────────────────────────────────────
-function GoalCard({
-  goal,
-  index,
-  onDone,
-  onDeleted,
-}: {
-  goal: GoalV2;
-  index: number;
+function GoalCard({ goal, index, onDone, onDeleted }: {
+  goal: GoalV2; index: number;
   onDone: (id: string) => void;
   onDeleted: (id: string) => void;
 }) {
   const { toast } = useToast();
-  const [busy, setBusy] = useState(false);
-  const meta = GOAL_TYPE_META[goal.goal_type];
-  const pct = Math.min(100, Math.round((goal.progress / goal.target) * 100));
+  const [busy,    setBusy]    = useState(false);
+  const [confirm, setConfirm] = useState(false);
+
+  const meta       = GOAL_META[goal.goal_type];
+  const pct        = Math.min(100, Math.round((goal.progress / goal.target) * 100));
   const isComplete = pct >= 100;
 
   async function handleCelebrate() {
@@ -108,14 +85,12 @@ function GoalCard({
           : undefined,
       }}
     >
-      {/* Shine line when complete */}
       {isComplete && (
         <div className="absolute inset-x-0 top-0 h-px"
           style={{ background: "linear-gradient(90deg, transparent, rgba(143,170,126,0.4), transparent)" }} />
       )}
 
       <div className="flex items-start gap-3">
-        {/* Icon */}
         <div
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px]"
           style={{
@@ -135,7 +110,6 @@ function GoalCard({
           )}
         </div>
 
-        {/* Percentage badge */}
         <span
           className="shrink-0 rounded-[8px] px-2 py-0.5 text-[12px] font-bold tabular-nums"
           style={{
@@ -157,14 +131,18 @@ function GoalCard({
         />
       </div>
 
-      {/* Progress label */}
+      {/* Bottom row */}
       <div className="flex items-center justify-between">
         <p className="text-[13px]" style={{ color: "var(--color-muted)" }}>
           <span className="font-semibold tabular-nums" style={{ color: "var(--color-foreground)" }}>
             {goal.progress}
           </span>
           {" / "}{goal.target}{" "}
-          <span style={{ color: "var(--color-muted)" }}>{meta.periodLabel}</span>
+          <span style={{ color: "var(--color-muted)" }}>
+            {goal.goal_type === "count_week" ? "cette semaine"
+             : goal.goal_type === "count_month" || goal.goal_type === "active_days_month" ? "ce mois"
+             : "jours"}
+          </span>
         </p>
 
         <div className="flex items-center gap-2">
@@ -180,14 +158,49 @@ function GoalCard({
               Célébrer
             </motion.button>
           )}
-          <button
-            onClick={handleDelete}
-            disabled={busy}
-            title="Supprimer"
-            className="flex h-6 w-6 items-center justify-center rounded-full text-muted hover:text-danger transition-colors"
-          >
-            <Trash2 size={12} />
-          </button>
+
+          {/* Delete with inline confirm */}
+          <AnimatePresence mode="wait">
+            {confirm ? (
+              <motion.div
+                key="confirm"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.14 }}
+                className="flex items-center gap-1"
+              >
+                <button
+                  onClick={() => { setConfirm(false); handleDelete(); }}
+                  disabled={busy}
+                  className="flex h-6 items-center gap-1 rounded-full px-2 text-[11px] font-semibold"
+                  style={{ background: "rgba(207,139,136,0.18)", color: "var(--color-danger)" }}
+                >
+                  <Check size={10} />
+                  Oui
+                </button>
+                <button
+                  onClick={() => setConfirm(false)}
+                  className="flex h-6 items-center gap-1 rounded-full px-2 text-[11px] font-semibold text-muted hover:text-foreground"
+                >
+                  Non
+                </button>
+              </motion.div>
+            ) : (
+              <motion.button
+                key="delete"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setConfirm(true)}
+                disabled={busy}
+                title="Supprimer"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-muted hover:text-danger transition-colors"
+              >
+                <Trash2 size={12} />
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>
@@ -195,12 +208,7 @@ function GoalCard({
 }
 
 // ── AddGoalSheet ──────────────────────────────────────────────────────────────
-function AddGoalSheet({
-  isOpen,
-  onClose,
-  onCreated,
-  habits,
-}: {
+function AddGoalSheet({ isOpen, onClose, onCreated, habits }: {
   isOpen: boolean;
   onClose: () => void;
   onCreated: (g: GoalV2) => void;
@@ -208,58 +216,65 @@ function AddGoalSheet({
 }) {
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState<GoalType | null>(null);
-  const [habitId,  setHabitId]  = useState<string>("");
-  const [count,    setCount]    = useState("");
-  const [busy,     setBusy]     = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
+  const [habitId,      setHabitId]      = useState<string>("");
+  const [count,        setCount]        = useState(5);
+  const [showHabits,   setShowHabits]   = useState(false);
+  const [busy,         setBusy]         = useState(false);
+  const [error,        setError]        = useState<string | null>(null);
 
-  const meta = selectedType ? GOAL_TYPE_META[selectedType] : null;
+  const meta      = selectedType ? GOAL_META[selectedType] : null;
   const habitName = habits.find((h) => h.id === habitId)?.name ?? null;
 
-  function autoTitle(): string {
-    if (!meta) return "";
-    return meta.unitLabel(parseInt(count) || meta.type === "active_days_month" ? parseInt(count) || 0 : parseInt(count) || 0, habitName);
+  function selectType(type: GoalType) {
+    setSelectedType(type);
+    setHabitId("");
+    setShowHabits(false);
+    setCount(GOAL_META[type].defaultCount);
+    setError(null);
   }
 
   function reset() {
     setSelectedType(null);
     setHabitId("");
-    setCount("");
+    setCount(5);
+    setShowHabits(false);
     setError(null);
   }
 
   function handleClose() { reset(); onClose(); }
 
+  function decrement() { setCount((c) => Math.max(1, c - 1)); }
+  function increment() { setCount((c) => c + 1); }
+
   async function create() {
     if (!selectedType) { setError("Choisis un type d'intention."); return; }
-    const n = parseInt(count);
-    if (isNaN(n) || n < 1) { setError("Entre un nombre cible valide (≥ 1)."); return; }
+    if (count < 1) { setError("Le nombre cible doit être au moins 1."); return; }
     if (meta?.needsHabit && !habitId) { setError("Choisis une habitude."); return; }
 
     setBusy(true); setError(null);
-    const title = autoTitle();
+    const title = buildTitle(selectedType, count, habitName);
     const { error: err } = await createGoalV2({
       goalType: selectedType,
       habitId:  meta?.needsHabit ? habitId : null,
-      target:   n,
+      target:   count,
       title,
     });
     setBusy(false);
     if (err) { setError(err); return; }
 
     onCreated({
-      id:         crypto.randomUUID(),
-      user_id:    "",
+      id:          crypto.randomUUID(),
+      user_id:     "",
       title,
-      goal_type:  selectedType,
-      habit_id:   meta?.needsHabit ? habitId : null,
-      target:     n,
-      start_date: null,
-      end_date:   null,
-      is_achieved:    false,
-      created_at: new Date().toISOString(),
-      progress:   0,
-      habit_name: habitName,
+      goal_type:   selectedType,
+      habit_id:    meta?.needsHabit ? habitId : null,
+      target:      count,
+      start_date:  null,
+      end_date:    null,
+      is_achieved: false,
+      created_at:  new Date().toISOString(),
+      progress:    0,
+      habit_name:  habitName,
     });
     toast("Intention créée.", "success");
     reset();
@@ -296,100 +311,210 @@ function AddGoalSheet({
               <div className="h-1 w-10 rounded-full bg-border" />
             </div>
 
+            {/* Header */}
             <div className="flex items-center justify-between px-5 pb-5 pt-3">
               <div>
                 <h2 className="font-display text-xl font-semibold">Nouvelle intention</h2>
                 <p className="mt-0.5 text-[13px] text-muted">Qu&apos;est-ce que tu veux ancrer ?</p>
               </div>
-              <button onClick={handleClose} className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:text-foreground">
+              <button
+                onClick={handleClose}
+                aria-label="Fermer"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:text-foreground"
+              >
                 <X size={16} />
               </button>
             </div>
 
             <div className="flex flex-col gap-5 px-5 pb-2">
-              {/* Type selection */}
+
+              {/* ── Type selector: pill row ── */}
               <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
                   Type d&apos;intention
-                </label>
-                <div className="grid grid-cols-2 gap-2">
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
                   {GOAL_TYPES.map((gt) => {
                     const active = selectedType === gt.type;
                     return (
                       <button
                         key={gt.type}
-                        onClick={() => { setSelectedType(gt.type); setHabitId(""); setCount(""); }}
-                        className="flex flex-col items-start gap-2 rounded-[14px] p-4 text-left transition-all"
+                        onClick={() => selectType(gt.type)}
+                        className="flex shrink-0 items-center gap-2 rounded-2xl border px-3.5 py-2 text-[13px] font-semibold transition-all"
                         style={{
-                          background: active ? "rgba(203,139,106,0.12)" : "rgba(255,255,255,0.03)",
-                          border: `1px solid ${active ? "rgba(203,139,106,0.35)" : "rgba(255,255,255,0.07)"}`,
-                          color: active ? "var(--color-primary)" : "var(--color-muted)",
+                          background:  active ? "rgba(203,139,106,0.12)" : "rgba(255,255,255,0.04)",
+                          borderColor: active ? "rgba(203,139,106,0.35)" : "rgba(255,255,255,0.08)",
+                          color:       active ? "var(--color-primary)"   : "var(--color-muted)",
                         }}
                       >
-                        <span className={active ? "text-primary" : ""}>{gt.icon}</span>
-                        <span className="text-[12px] font-semibold leading-tight" style={{ color: "var(--color-foreground)" }}>
-                          {gt.label}
+                        <span style={{ color: active ? "var(--color-primary)" : "var(--color-muted)" }}>
+                          {gt.icon}
                         </span>
+                        <span>{gt.label}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Habit picker — only for frequency types */}
-              {meta?.needsHabit && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-                    Habitude
-                  </label>
-                  {habits.length === 0 ? (
-                    <p className="text-[13px] text-muted">Aucune habitude active. Crée-en une d&apos;abord.</p>
-                  ) : (
-                    <select
-                      value={habitId}
-                      onChange={(e) => setHabitId(e.target.value)}
-                      className="w-full rounded-[13px] border px-4 py-3 text-[14px] outline-none focus:border-primary/50"
-                      style={{
-                        background: "var(--color-surface-2)",
-                        borderColor: "rgba(255,255,255,0.07)",
-                        color: habitId ? "var(--color-foreground)" : "var(--color-muted)",
-                      }}
-                    >
-                      <option value="">Choisir une habitude…</option>
-                      {habits.map((h) => (
-                        <option key={h.id} value={h.id}>{h.name}</option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-              )}
-
-              {/* Target count */}
-              {selectedType && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-                    Cible (nombre)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={count}
-                    onChange={(e) => setCount(e.target.value)}
-                    placeholder={selectedType === "active_days_month" ? "Ex. 20" : selectedType === "streak" ? "Ex. 30" : "Ex. 5"}
-                    className="w-full rounded-[13px] border px-4 py-3 text-[14px] outline-none focus:border-primary/50"
+              {/* ── Sentence builder ── */}
+              <AnimatePresence>
+                {selectedType && (
+                  <motion.div
+                    key={selectedType}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="rounded-[18px] flex flex-col gap-4 p-5"
                     style={{
-                      background: "var(--color-surface-2)",
-                      borderColor: "rgba(255,255,255,0.07)",
-                      color: "var(--color-foreground)",
+                      background:  "rgba(203,139,106,0.05)",
+                      border:      "1px solid rgba(203,139,106,0.15)",
                     }}
-                  />
-                  {count && parseInt(count) >= 1 && (
+                  >
+                    {/* Sentence with inline tokens */}
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[16px] leading-[1.8]">
+                      {(selectedType === "count_week" || selectedType === "count_month") && (
+                        <>
+                          <span style={{ color: "var(--color-muted)" }}>Faire</span>
+
+                          {/* Habit token */}
+                          <button
+                            onClick={() => setShowHabits((v) => !v)}
+                            className="inline-flex items-center gap-1 rounded-[8px] px-2 py-0.5 text-[15px] font-semibold transition-all"
+                            style={{
+                              background:  habitId ? "rgba(203,139,106,0.12)" : "rgba(255,255,255,0.06)",
+                              border:      `1px solid ${habitId ? "rgba(203,139,106,0.3)" : "rgba(255,255,255,0.1)"}`,
+                              color:       habitId ? "var(--color-foreground)" : "var(--color-muted)",
+                            }}
+                          >
+                            {habitId ? (habitName ?? "une habitude") : "une habitude"}
+                            <ChevronDown
+                              size={12}
+                              style={{
+                                opacity: 0.6,
+                                transform: showHabits ? "rotate(180deg)" : "rotate(0)",
+                                transition: "transform 0.18s ease",
+                              }}
+                            />
+                          </button>
+
+                          {/* Count token */}
+                          <span
+                            className="inline-flex items-center overflow-hidden rounded-[8px]"
+                            style={{ border: "1px solid rgba(203,139,106,0.25)", background: "rgba(203,139,106,0.08)" }}
+                          >
+                            <button
+                              onClick={decrement}
+                              className="flex h-7 w-7 items-center justify-center text-[16px] font-bold transition-colors hover:bg-primary/10"
+                              style={{ color: "var(--color-primary)" }}
+                              aria-label="Diminuer"
+                            >−</button>
+                            <span
+                              className="min-w-[1.75rem] text-center text-[15px] font-bold tabular-nums"
+                              style={{ color: "var(--color-foreground)" }}
+                            >
+                              {count}
+                            </span>
+                            <button
+                              onClick={increment}
+                              className="flex h-7 w-7 items-center justify-center text-[16px] font-bold transition-colors hover:bg-primary/10"
+                              style={{ color: "var(--color-primary)" }}
+                              aria-label="Augmenter"
+                            >+</button>
+                          </span>
+
+                          <span style={{ color: "var(--color-muted)" }}>
+                            fois {selectedType === "count_week" ? "cette semaine" : "ce mois"}
+                          </span>
+                        </>
+                      )}
+
+                      {selectedType === "streak" && (
+                        <>
+                          <span style={{ color: "var(--color-muted)" }}>Atteindre</span>
+                          <span
+                            className="inline-flex items-center overflow-hidden rounded-[8px]"
+                            style={{ border: "1px solid rgba(203,139,106,0.25)", background: "rgba(203,139,106,0.08)" }}
+                          >
+                            <button onClick={decrement} className="flex h-7 w-7 items-center justify-center text-[16px] font-bold hover:bg-primary/10" style={{ color: "var(--color-primary)" }} aria-label="Diminuer">−</button>
+                            <span className="min-w-[1.75rem] text-center text-[15px] font-bold tabular-nums" style={{ color: "var(--color-foreground)" }}>{count}</span>
+                            <button onClick={increment} className="flex h-7 w-7 items-center justify-center text-[16px] font-bold hover:bg-primary/10" style={{ color: "var(--color-primary)" }} aria-label="Augmenter">+</button>
+                          </span>
+                          <span style={{ color: "var(--color-muted)" }}>jours de série consécutifs</span>
+                        </>
+                      )}
+
+                      {selectedType === "active_days_month" && (
+                        <>
+                          <span style={{ color: "var(--color-muted)" }}>Être actif</span>
+                          <span
+                            className="inline-flex items-center overflow-hidden rounded-[8px]"
+                            style={{ border: "1px solid rgba(203,139,106,0.25)", background: "rgba(203,139,106,0.08)" }}
+                          >
+                            <button onClick={decrement} className="flex h-7 w-7 items-center justify-center text-[16px] font-bold hover:bg-primary/10" style={{ color: "var(--color-primary)" }} aria-label="Diminuer">−</button>
+                            <span className="min-w-[1.75rem] text-center text-[15px] font-bold tabular-nums" style={{ color: "var(--color-foreground)" }}>{count}</span>
+                            <button onClick={increment} className="flex h-7 w-7 items-center justify-center text-[16px] font-bold hover:bg-primary/10" style={{ color: "var(--color-primary)" }} aria-label="Augmenter">+</button>
+                          </span>
+                          <span style={{ color: "var(--color-muted)" }}>jours ce mois</span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Habit list (expandable) */}
+                    <AnimatePresence initial={false}>
+                      {showHabits && meta?.needsHabit && (
+                        <motion.div
+                          key="habit-list"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.18 }}
+                          className="overflow-hidden"
+                        >
+                          <div
+                            className="flex flex-col rounded-[12px] overflow-hidden"
+                            style={{ border: "1px solid rgba(255,255,255,0.07)" }}
+                          >
+                            {habits.length === 0 ? (
+                              <p className="px-4 py-3 text-[13px] text-muted">
+                                Aucune habitude active. Crée-en une d&apos;abord.
+                              </p>
+                            ) : (
+                              habits.map((h) => (
+                                <button
+                                  key={h.id}
+                                  onClick={() => { setHabitId(h.id); setShowHabits(false); }}
+                                  className="flex items-center gap-3 px-4 py-3 text-left text-[14px] font-medium transition-colors"
+                                  style={{
+                                    background: habitId === h.id ? "rgba(203,139,106,0.1)" : "rgba(255,255,255,0.02)",
+                                    color:      habitId === h.id ? "var(--color-primary)" : "var(--color-foreground)",
+                                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                                  }}
+                                >
+                                  <span className="text-xl">{h.icon ?? "🎯"}</span>
+                                  <span>{h.name}</span>
+                                  {habitId === h.id && (
+                                    <Check size={14} className="ml-auto shrink-0" style={{ color: "var(--color-primary)" }} />
+                                  )}
+                                </button>
+                              ))
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Preview sentence */}
                     <p className="text-[12px]" style={{ color: "var(--color-muted)" }}>
-                      → <span style={{ color: "var(--color-foreground)" }}>{autoTitle()}</span>
+                      →{" "}
+                      <span style={{ color: "var(--color-foreground)", fontStyle: "italic" }}>
+                        &quot;{buildSentence(selectedType, count, habitName)}&quot;
+                      </span>
                     </p>
-                  )}
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {error && (
                 <p
@@ -423,7 +548,7 @@ export function GoalsManager({ goals: initialGoals, habits }: { goals: GoalV2[];
   const [isOpen, setIsOpen] = useState(false);
 
   function onCreated(g: GoalV2) { setGoals((prev) => [g, ...prev]); }
-  function onDone(id: string) { setGoals((prev) => prev.filter((g) => g.id !== id)); }
+  function onDone(id: string)    { setGoals((prev) => prev.filter((g) => g.id !== id)); }
   function onDeleted(id: string) { setGoals((prev) => prev.filter((g) => g.id !== id)); }
 
   return (
@@ -437,9 +562,7 @@ export function GoalsManager({ goals: initialGoals, habits }: { goals: GoalV2[];
           className="flex w-full items-center gap-4 rounded-[18px] border border-dashed px-6 py-5 text-left"
           style={{ borderColor: "rgba(203,139,106,0.25)", background: "rgba(203,139,106,0.04)" }}
         >
-          <span
-            className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-primary"
-          >
+          <span className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-primary">
             <Plus size={18} className="text-white" />
           </span>
           <div>
@@ -455,10 +578,8 @@ export function GoalsManager({ goals: initialGoals, habits }: { goals: GoalV2[];
             animate={{ opacity: 1, y: 0 }}
             className="card flex flex-col items-center gap-4 p-12 text-center"
           >
-            <div
-              className="flex h-14 w-14 items-center justify-center rounded-2xl"
-              style={{ background: "rgba(203,139,106,0.1)" }}
-            >
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl"
+              style={{ background: "rgba(203,139,106,0.1)" }}>
               <Target size={24} style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
