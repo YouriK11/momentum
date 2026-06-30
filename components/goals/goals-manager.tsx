@@ -256,7 +256,7 @@ function AddGoalSheet({
       target:     n,
       start_date: null,
       end_date:   null,
-      is_done:    false,
+      is_achieved:    false,
       created_at: new Date().toISOString(),
       progress:   0,
       habit_name: habitName,

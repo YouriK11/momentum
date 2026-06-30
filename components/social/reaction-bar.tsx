@@ -61,15 +61,20 @@ export function ReactionBar({ eventId, reactions, currentUserId, isOwn }: Reacti
       ]);
     }
 
-    const result = isRemoving
-      ? await removeReaction(eventId)
-      : await upsertReaction(eventId, type);
+    try {
+      const result = isRemoving
+        ? await removeReaction(eventId)
+        : await upsertReaction(eventId, type);
 
-    setBusy(false);
-
-    if (result.error) {
+      if (result.error) {
+        setOptimistic(reactions); // rollback
+        toast(result.error, "error");
+      }
+    } catch {
       setOptimistic(reactions); // rollback
-      toast(result.error, "error");
+      toast("Impossible d'enregistrer ta réaction.", "error");
+    } finally {
+      setBusy(false);
     }
   }
 

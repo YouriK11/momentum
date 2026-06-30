@@ -10,7 +10,7 @@ type RawGoalV2 = {
   target: number;
   start_date: string | null;
   end_date: string | null;
-  is_done: boolean;
+  is_achieved: boolean;
   created_at: string;
   habit: { name: string } | null;
 };
@@ -18,10 +18,10 @@ type RawGoalV2 = {
 export async function getGoalsV2(db: TypedDb, userId: string): Promise<GoalV2[]> {
   const { data } = await (db
     .from("goals")
-    .select("id, user_id, title, goal_type, habit_id, target, start_date, end_date, is_done, created_at, habit:habits!habit_id (name)")
+    .select("id, user_id, title, goal_type, habit_id, target, start_date, end_date, is_achieved, created_at, habit:habits!habit_id (name)")
     .eq("user_id", userId)
     .not("goal_type", "is", null)
-    .eq("is_done", false)
+    .eq("is_achieved", false)
     .order("created_at", { ascending: false }) as unknown as Promise<{ data: RawGoalV2[] | null; error: unknown }>);
 
   if (!data) return [];
@@ -35,7 +35,7 @@ export async function getGoalsV2(db: TypedDb, userId: string): Promise<GoalV2[]>
     target: row.target ?? 1,
     start_date: row.start_date,
     end_date: row.end_date,
-    is_done: row.is_done,
+    is_achieved: row.is_achieved,
     created_at: row.created_at,
     habit_name: row.habit?.name ?? null,
     progress: 0,

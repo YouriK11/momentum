@@ -35,7 +35,7 @@ export type Goal = {
   current_value: number;
   unit: string | null;
   deadline: string | null;
-  is_done: boolean;
+  is_achieved: boolean;
   created_at: string;
 };
 
@@ -50,7 +50,7 @@ export type GoalV2 = {
   target: number;
   start_date: string | null;
   end_date: string | null;
-  is_done: boolean;
+  is_achieved: boolean;
   created_at: string;
   progress: number;
   habit_name: string | null;

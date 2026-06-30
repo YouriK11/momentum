@@ -119,7 +119,7 @@ export interface Database {
           id: string;
           user_id: string;
           title: string;
-          is_done: boolean;
+          is_achieved: boolean;
           created_at: string;
           goal_type: "count_week" | "count_month" | "streak" | "active_days_month" | null;
           habit_id: string | null;
@@ -127,8 +127,8 @@ export interface Database {
           start_date: string | null;
           end_date: string | null;
         };
-        Insert: { id?: string; user_id: string; title: string; is_done?: boolean; goal_type?: string | null; habit_id?: string | null; target?: number; start_date?: string | null; end_date?: string | null };
-        Update: { title?: string; is_done?: boolean; goal_type?: string | null; habit_id?: string | null; target?: number; start_date?: string | null; end_date?: string | null };
+        Insert: { id?: string; user_id: string; title: string; is_achieved?: boolean; goal_type?: string | null; habit_id?: string | null; target?: number; start_date?: string | null; end_date?: string | null };
+        Update: { title?: string; is_achieved?: boolean; goal_type?: string | null; habit_id?: string | null; target?: number; start_date?: string | null; end_date?: string | null };
         Relationships: [];
       };
 

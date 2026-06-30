@@ -73,7 +73,7 @@ export async function celebrateGoal(id: string): Promise<GoalActionResult> {
 
   const { error } = await supabase
     .from("goals")
-    .update({ is_done: true })
+    .update({ is_achieved: true })
     .eq("id", id)
     .eq("user_id", user.id);
 
