@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type Row = { userId: string; username: string; streak: number; today: number; weekAvg: number };
 type Ranked = Row & { rank: number; value: number };
@@ -57,12 +58,14 @@ export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
           {podiumOrder.map((r) => (
             <div key={r.userId} className="flex flex-1 flex-col items-center">
               <div className="mb-2 text-2xl" aria-hidden="true">{medal(r.rank)}</div>
-              <p
-                className="mb-1 max-w-full truncate text-sm font-medium"
+              <Link
+                href={`/profil/${r.userId}`}
+                className="mb-1 max-w-full truncate text-sm font-medium hover:underline underline-offset-2"
                 style={{ color: r.userId === meId ? "var(--color-primary)" : "var(--color-foreground)" }}
+                aria-label={`Voir le profil de ${r.username}`}
               >
                 {r.username}
-              </p>
+              </Link>
               <div
                 className="flex w-full items-start justify-center rounded-t-xl pt-2"
                 style={{
@@ -87,13 +90,15 @@ export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
       {/* List (rank 4+) */}
       <div className="flex flex-col gap-2">
         {rest.map((r) => (
-          <div
+          <Link
             key={r.userId}
-            className="flex items-center gap-3 rounded-xl border p-3"
+            href={`/profil/${r.userId}`}
+            className="flex items-center gap-3 rounded-xl border p-3 transition-opacity hover:opacity-80"
             style={{
               background: r.userId === meId ? "rgba(203,139,106,0.05)" : "var(--color-surface-2)",
               borderColor: r.userId === meId ? "rgba(203,139,106,0.3)" : "var(--color-border)",
             }}
+            aria-label={`Voir le profil de ${r.username}`}
           >
             <span className="w-6 text-center text-sm text-muted">{r.rank}</span>
             <span className="flex-1 truncate font-medium">
@@ -109,7 +114,7 @@ export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
             >
               {r.value}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
 

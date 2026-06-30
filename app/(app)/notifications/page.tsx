@@ -104,13 +104,15 @@ export default async function NotificationsPage() {
       ) : (
         <div className="flex flex-col gap-2">
           {notifs.map((n) => (
-            <div
+            <Link
               key={n.id}
-              className="flex items-center gap-4 rounded-[16px] px-4 py-4"
+              href={n.actor_id ? `/profil/${n.actor_id}` : "/profil"}
+              className="flex items-center gap-4 rounded-[16px] px-4 py-4 transition-opacity hover:opacity-90"
               style={{
                 background: n.read ? "rgba(255,255,255,0.02)" : "rgba(203,139,106,0.06)",
                 border: `1px solid ${n.read ? "rgba(255,255,255,0.06)" : "rgba(203,139,106,0.18)"}`,
               }}
+              aria-label={`Voir le profil de ${n.actor?.username ?? "cet utilisateur"}`}
             >
               {/* Actor avatar */}
               <div
@@ -143,7 +145,7 @@ export default async function NotificationsPage() {
                   style={{ background: "var(--color-primary)" }}
                 />
               )}
-            </div>
+            </Link>
           ))}
         </div>
       )}

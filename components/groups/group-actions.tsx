@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, UserMinus, Trash2, UserPlus, AlertTriangle } from "lucide-react";
@@ -153,13 +154,24 @@ export function GroupActions({ groupId, groupName, inviteCode, isOwner, members,
                   className="flex items-center gap-3 rounded-[12px] px-3 py-2"
                   style={{ background: "var(--color-surface-2)" }}
                 >
-                  <Avatar url={m.avatarUrl} name={m.username} size={32} />
-                  <span className="flex-1 text-[14px] font-medium">
-                    {m.username}
-                    {m.userId === meId && (
-                      <span className="ml-2 text-[11px] text-muted">(toi)</span>
-                    )}
-                  </span>
+                  {m.userId === meId ? (
+                    <>
+                      <Avatar url={m.avatarUrl} name={m.username} size={32} />
+                      <span className="flex-1 text-[14px] font-medium">
+                        {m.username}
+                        <span className="ml-2 text-[11px] text-muted">(toi)</span>
+                      </span>
+                    </>
+                  ) : (
+                    <Link
+                      href={`/profil/${m.userId}`}
+                      className="flex flex-1 items-center gap-3 transition-opacity hover:opacity-80"
+                      aria-label={`Voir le profil de ${m.username}`}
+                    >
+                      <Avatar url={m.avatarUrl} name={m.username} size={32} />
+                      <span className="text-[14px] font-medium">{m.username}</span>
+                    </Link>
+                  )}
                   {isOwner && m.userId !== meId && (
                     <button
                       onClick={() => removeMember(m.userId, m.username)}
