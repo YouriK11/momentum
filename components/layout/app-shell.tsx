@@ -2,18 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flame, Home, Users, ListChecks, User, LogOut, Target, Bell } from "lucide-react";
+import { Flame, Home, Users, ListChecks, User, LogOut, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 import { Avatar } from "@/components/profile/avatar";
 import { signout } from "@/app/auth/actions";
 import { PageTransition } from "@/components/layout/page-transition";
 
 const NAV = [
-  { href: "/home",      label: "Aujourd'hui", Icon: Home },
-  { href: "/groupes",   label: "Groupes",     Icon: Users },
-  { href: "/habits",    label: "Habitudes",   Icon: ListChecks },
-  { href: "/objectifs", label: "Objectifs",   Icon: Target },
-  { href: "/profil",    label: "Profil",      Icon: User },
+  { href: "/home",    label: "Aujourd'hui", Icon: Home },
+  { href: "/groupes", label: "Groupes",     Icon: Users },
+  { href: "/habits",  label: "Habitudes",   Icon: ListChecks },
+  { href: "/profil",  label: "Profil",      Icon: User },
 ] as const;
 
 export function AppShell({

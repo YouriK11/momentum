@@ -42,6 +42,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
   const [name,        setName]        = useState("");
   const [description, setDescription] = useState("");
   const [icon,        setIcon]        = useState("🌱");
+  const [customEmoji, setCustomEmoji] = useState("");
   const [level,       setLevel]       = useState<HabitLevel>("moyen");
   const [target,      setTarget]      = useState("perso");
   const [frequency,   setFrequency]   = useState<HabitFrequency>("daily");
@@ -63,7 +64,7 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
       const hasExtra = !!(habitToEdit.description || habitToEdit.level !== "moyen" || habitToEdit.frequency !== "daily" || habitToEdit.group_id);
       setShowMore(hasExtra);
     } else {
-      setName(""); setDescription(""); setIcon("🌱"); setLevel("moyen");
+      setName(""); setDescription(""); setIcon("🌱"); setCustomEmoji(""); setLevel("moyen");
       setTarget("perso"); setFrequency("daily"); setFreqDays([]); setShowMore(false);
     }
     setError(null);
@@ -197,15 +198,53 @@ export function HabitSheet({ isOpen, onClose, userId, groups, onSuccess, habitTo
                 <div className="grid grid-cols-6 gap-2">
                   {EMOJIS.map((e) => (
                     <motion.button
-                      key={e} type="button" onClick={() => setIcon(e)} whileTap={{ scale: 0.85 }}
+                      key={e} type="button"
+                      onClick={() => { setIcon(e); setCustomEmoji(""); }}
+                      whileTap={{ scale: 0.85 }}
                       className="flex h-11 w-full items-center justify-center rounded-[10px] border text-xl"
                       style={{
-                        background:  icon === e ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
-                        borderColor: icon === e ? "rgba(203,139,106,0.35)" : "var(--color-border)",
+                        background:  icon === e && !customEmoji ? "rgba(203,139,106,0.1)" : "var(--color-surface-2)",
+                        borderColor: icon === e && !customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)",
                         transition: "all 0.15s ease",
                       }}
                     >{e}</motion.button>
                   ))}
+                </div>
+
+                {/* Custom emoji */}
+                <div className="mt-2 flex items-center gap-3">
+                  <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-muted">Autre</span>
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      placeholder="Colle un emoji…"
+                      value={customEmoji}
+                      onChange={(e) => {
+                        const chars = [...e.target.value]; // Unicode-aware split
+                        if (chars.length > 0) {
+                          const first = chars[0];
+                          setCustomEmoji(first);
+                          setIcon(first);
+                        } else {
+                          setCustomEmoji("");
+                        }
+                      }}
+                      className="w-full rounded-[10px] border py-2 pl-3 pr-10 text-sm outline-none"
+                      style={{
+                        background: customEmoji ? "rgba(203,139,106,0.08)" : "var(--color-surface-2)",
+                        borderColor: customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)",
+                        color: "var(--color-foreground)",
+                        transition: "border-color 0.15s ease",
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = "rgba(203,139,106,0.4)")}
+                      onBlur={(e)  => (e.target.style.borderColor = customEmoji ? "rgba(203,139,106,0.35)" : "var(--color-border)")}
+                    />
+                    {customEmoji && (
+                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xl">
+                        {customEmoji}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Field>
 

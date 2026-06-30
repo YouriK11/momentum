@@ -3,8 +3,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserGroups } from "@/lib/data/groups";
 import { getFeedEvents } from "@/lib/data/social";
+import { getProfile } from "@/lib/data/profile";
+import { getGoalsV2, computeGoalProgress } from "@/lib/data/goals";
+import { getActiveHabits } from "@/lib/data/habits";
 import { GroupsPanel } from "@/components/groups/groups-panel";
 import { CircleFeed } from "@/components/social/circle-feed";
+import { GoalsManager } from "@/components/goals/goals-manager";
+import type { Habit, GoalV2 } from "@/lib/types";
 
 interface Props {
   searchParams: Promise<Record<string, string>>;
@@ -12,7 +17,8 @@ interface Props {
 
 export default async function GroupesPage({ searchParams }: Props) {
   const { view } = await searchParams;
-  const isCercle = view === "cercle";
+  const isCercle    = view === "cercle";
+  const isObjectifs = view === "objectifs";
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -21,10 +27,26 @@ export default async function GroupesPage({ searchParams }: Props) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [{ data: groups }, feedEvents] = await Promise.all([
+  // Always fetch groups (used in "Mes groupes" tab)
+  const [{ data: groups }, feedEvents, profileResult, rawGoals, habitsResult] = await Promise.all([
     getUserGroups(supabase),
-    isCercle ? getFeedEvents(supabase, userId, 30) : Promise.resolve([]),
+    isCercle    ? getFeedEvents(supabase, userId, 30)  : Promise.resolve([]),
+    isObjectifs ? getProfile(supabase, userId)          : Promise.resolve({ data: null }),
+    isObjectifs ? getGoalsV2(supabase, userId)          : Promise.resolve([] as GoalV2[]),
+    isObjectifs ? getActiveHabits(supabase)             : Promise.resolve({ data: null }),
   ]);
+
+  const goals = isObjectifs
+    ? await computeGoalProgress(
+        supabase,
+        userId,
+        rawGoals as GoalV2[],
+        today,
+        (profileResult as { data: { current_streak: number } | null }).data?.current_streak ?? 0,
+      )
+    : [];
+
+  const habits = ((habitsResult as { data: unknown[] | null } | null)?.data ?? []) as Habit[];
 
   return (
     <div className="flex flex-col gap-8">
@@ -36,12 +58,12 @@ export default async function GroupesPage({ searchParams }: Props) {
           className="mt-1 font-display font-semibold tracking-tight"
           style={{ fontSize: "clamp(32px, 3.5vw, 48px)", letterSpacing: "-0.03em" }}
         >
-          {isCercle ? "Le cercle" : "Mes groupes"}
+          {isCercle ? "Le cercle" : isObjectifs ? "Mes intentions" : "Mes groupes"}
         </h1>
         <p className="mt-2 text-[15px] text-muted">
-          {isCercle
-            ? "Les progrès de tes amis, en temps réel."
-            : "Crée un cercle ou rejoins celui d'un ami."}
+          {isCercle    ? "Les progrès de tes amis, en temps réel."
+           : isObjectifs ? "Qu'est-ce que tu veux ancrer ?"
+           : "Tes cercles et tes intentions, réunis."}
         </p>
       </header>
 
@@ -50,12 +72,15 @@ export default async function GroupesPage({ searchParams }: Props) {
         className="flex gap-1 self-start rounded-[14px] p-1"
         style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
       >
-        <TabLink href="/groupes" active={!isCercle}>Mes groupes</TabLink>
-        <TabLink href="/groupes?view=cercle" active={isCercle}>Le cercle</TabLink>
+        <TabLink href="/groupes"                active={!isCercle && !isObjectifs}>Mes groupes</TabLink>
+        <TabLink href="/groupes?view=objectifs" active={isObjectifs}>Objectifs</TabLink>
+        <TabLink href="/groupes?view=cercle"    active={isCercle}>Le cercle</TabLink>
       </div>
 
       {isCercle ? (
-        <CircleFeed events={feedEvents} currentUserId={userId} today={today} />
+        <CircleFeed events={feedEvents as Parameters<typeof CircleFeed>[0]["events"]} currentUserId={userId} today={today} />
+      ) : isObjectifs ? (
+        <GoalsManager goals={goals} habits={habits} />
       ) : (
         <GroupsPanel groups={groups ?? []} />
       )}
