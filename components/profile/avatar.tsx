@@ -1,12 +1,15 @@
+import Image from "next/image";
+
 export function Avatar({
   url, name, size = 40,
 }: { url: string | null; name?: string; size?: number }) {
   if (url) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={url}
         alt={name ?? "avatar"}
+        width={size}
+        height={size}
         className="rounded-full object-cover"
         style={{ width: size, height: size }}
       />

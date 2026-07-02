@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { Bell } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = { title: "Notifications" };
 
 type RawNotif = {
   id: string;
@@ -31,7 +34,7 @@ function timeAgo(dateStr: string): string {
   if (h < 24)    return `il y a ${h} h`;
   const d = Math.floor(h / 24);
   if (d < 7)     return `il y a ${d} j`;
-  return new Date(dateStr).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  return new Date(dateStr).toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
 }
 
 function notifText(n: RawNotif): string {

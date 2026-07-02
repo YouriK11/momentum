@@ -1,6 +1,15 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGroupById, getGroupLeaderboard } from "@/lib/data/groups";
+import { todayBrussels } from "@/lib/date";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: group } = await getGroupById(supabase, id);
+  return { title: group?.name ?? "Groupe" };
+}
 import { Leaderboard } from "@/components/groups/leaderboard";
 import { GroupActions, type GroupMember } from "@/components/groups/group-actions";
 
@@ -11,7 +20,7 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
   const userId = user?.id;
   if (!userId) redirect("/login");
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayBrussels();
 
   const [{ data: group }, { data: lb }] = await Promise.all([
     getGroupById(supabase, id),

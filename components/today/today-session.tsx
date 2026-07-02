@@ -2,14 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Check, Flame, Trophy } from "lucide-react";
+import { Check, Flame, Trophy, Sprout } from "lucide-react";
 import { motion, animate, useSpring } from "framer-motion";
-import type { Habit, HabitLevel } from "@/lib/types";
+import type { Habit } from "@/lib/types";
 import { useToast } from "@/components/ui/toast";
 
-const LEVEL_LABEL: Record<HabitLevel, string> = {
-  facile: "Facile", moyen: "Moyen", difficile: "Difficile",
-};
 const R             = 52;
 const CIRCUMFERENCE = 2 * Math.PI * R;
 
@@ -35,7 +32,23 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
   const score   = total > 0 ? Math.round((earned / total) * 100) : 0;
   const left    = habits.length - done.size;
   const isEmpty = habits.length === 0;
+  const isComplete = !isEmpty && score === 100;
   const zone    = isEmpty ? "rgba(168,158,141,0.3)" : score >= 80 ? "#8faa7e" : score >= 50 ? "#c4a882" : "#cf8b88";
+
+  // Confetti when score transitions to 100 (not on mount)
+  const prevScore = useRef(score);
+  useEffect(() => {
+    const wasBelow = prevScore.current < 100;
+    prevScore.current = score;
+    if (score === 100 && wasBelow && habits.length > 0) {
+      import("canvas-confetti").then(({ default: confetti }) => {
+        confetti({
+          particleCount: 150, spread: 80, origin: { y: 0.35 },
+          colors: ["#cb8b6a", "#8faa7e", "#c4a882", "#ffffff"],
+        });
+      });
+    }
+  }, [score, habits.length]);
 
   const springOffset = useSpring(CIRCUMFERENCE, { stiffness: 72, damping: 18, mass: 1.2 });
   useEffect(() => { springOffset.set(CIRCUMFERENCE * (1 - score / 100)); }, [score, springOffset]);
@@ -59,7 +72,7 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
     });
   };
 
-  const dateLabel = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  const dateLabel = new Date().toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
   const persos    = habits.filter((h) => !h.group_id);
   const commons   = habits.filter((h) =>  h.group_id);
 
@@ -75,10 +88,13 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
       </div>
 
       {/* ── Progress card ─────────────────────────────────────────────── */}
-      <div className="card relative overflow-hidden p-6 md:p-7">
+      <div className="card relative overflow-hidden p-6 md:p-7" style={{
+        borderColor: isComplete ? "rgba(143,170,126,0.3)" : undefined,
+        transition: "border-color 0.5s ease",
+      }}>
         <div
           className="absolute inset-x-0 top-0 h-px"
-          style={{ background: `linear-gradient(90deg, transparent, ${zone}28, transparent)`, transition: "background 0.5s ease" }}
+          style={{ background: `linear-gradient(90deg, transparent, ${zone}${isComplete ? "55" : "28"}, transparent)`, transition: "background 0.5s ease" }}
         />
 
         <span className="sr-only" aria-live="polite" aria-atomic="true">
@@ -114,6 +130,7 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                className="tabular-nums"
                 style={{ color: zone, display: "inline-block" }}
               >
                 {done.size}
@@ -127,6 +144,17 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
                 ? "Toutes faites — bien joué !"
                 : `${left} restante${left > 1 ? "s" : ""} aujourd'hui`}
             </p>
+            {isComplete && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.1 }}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-[8px] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide"
+                style={{ background: "rgba(143,170,126,0.12)", color: "var(--color-success)", border: "1px solid rgba(143,170,126,0.2)" }}
+              >
+                Journée complète
+              </motion.span>
+            )}
             <div className="mt-4 flex flex-wrap gap-2">
               <StatChip icon={<Flame size={12} />} value={streak}     label="série" />
               <StatChip icon={<Trophy size={12} />} value={bestStreak} label="record" />
@@ -152,7 +180,12 @@ export function TodaySession({ userId, username, streak, bestStreak, habits, ini
           animate={{ opacity: 1, y: 0 }}
           className="card flex flex-col items-center gap-3 p-12 text-center"
         >
-          <span className="text-3xl">🌱</span>
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-[18px]"
+            style={{ background: "rgba(255,255,255,0.04)" }}
+          >
+            <Sprout size={24} className="text-muted" />
+          </div>
           <div>
             <p className="font-semibold">Aucune habitude</p>
             <p className="mt-1 text-sm text-muted">Crée ta première habitude pour commencer.</p>
@@ -299,13 +332,6 @@ function HabitRow({ habit: h, checked, onToggle, index }: {
         )}
       </div>
 
-      {/* Level badge */}
-      <span
-        className="shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-medium"
-        style={{ color: "var(--color-muted)", background: "var(--color-surface-2)" }}
-      >
-        {LEVEL_LABEL[h.level]}
-      </span>
     </motion.button>
   );
 }

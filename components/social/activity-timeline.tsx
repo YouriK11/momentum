@@ -18,7 +18,7 @@ const EVENT_META: Record<
     icon: <Flame size={15} />,
     color: "var(--color-primary)",
     bg: "rgba(203,139,106,0.15)",
-    label: (p) => `Série de ${p.streak} jours 🔥`,
+    label: (p) => `Série de ${p.streak} jours`,
   },
   goal_achieved: {
     icon: <Target size={15} />,
@@ -36,7 +36,7 @@ const EVENT_META: Record<
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  return d.toLocaleDateString("fr-BE", { day: "numeric", month: "short" });
 }
 
 // ── EventCard ─────────────────────────────────────────────────────────────────

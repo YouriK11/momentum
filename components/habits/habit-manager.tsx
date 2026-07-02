@@ -3,20 +3,15 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Archive, ChevronRight, Pencil, CalendarDays, Check, X } from "lucide-react";
+import { Plus, Archive, ChevronRight, Pencil, CalendarDays, Check, X, Sprout } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import type { Habit, HabitLevel, HabitFrequency } from "@/lib/types";
+import type { Habit, HabitFrequency } from "@/lib/types";
 import { archiveHabit } from "@/app/(app)/habits/actions";
+import { todayLocal, daysAgoLocal } from "@/lib/date";
 import { HabitSheet } from "@/components/habits/habit-sheet";
 import { useToast } from "@/components/ui/toast";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-const ACCENT: Record<HabitLevel, string> = {
-  facile: "#8faa7e", moyen: "#c4a882", difficile: "#cf8b88",
-};
-const LEVEL_LABEL: Record<HabitLevel, string> = {
-  facile: "Facile", moyen: "Moyen", difficile: "Difficile",
-};
 const FREQ_LABEL: Record<HabitFrequency, string> = {
   daily:         "Quotidien",
   specific_days: "Jours précis",
@@ -124,7 +119,7 @@ export function HabitManager({ userId, habits, groups }: Props) {
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl"
               style={{ background: "var(--color-surface-2)" }}>
-              <span className="text-2xl">🌱</span>
+              <Sprout size={24} className="text-muted" />
             </div>
             <div>
               <p className="font-semibold">Lance-toi !</p>
@@ -151,7 +146,6 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
   habit: Habit; index: number; userId: string;
   isArchiving: boolean; onArchive: () => void; onEdit: () => void; canManage: boolean;
 }) {
-  const accent         = ACCENT[h.level];
   const supabase       = useMemo(() => createClient(), []);
   const [showHist,     setShowHist]    = useState(false);
   const [histDates,    setHistDates]   = useState<string[]>([]);
@@ -161,7 +155,7 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
   async function toggleHistory() {
     if (!showHist && histDates.length === 0) {
       setHistBusy(true);
-      const from = new Date(Date.now() - 27 * 864e5).toISOString().slice(0, 10);
+      const from = daysAgoLocal(27);
       const { data } = await supabase
         .from("habit_logs")
         .select("log_date")
@@ -186,7 +180,7 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
       {/* Main row */}
       <div className="flex items-center gap-4 p-5">
         <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[14px] text-2xl"
-          style={{ background: accent + "22" }}>
+          style={{ background: "var(--color-surface-2)" }}>
           {h.icon ?? "🎯"}
         </div>
 
@@ -197,17 +191,12 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
           </p>
         </div>
 
-        <span className="shrink-0 rounded-[9px] px-2.5 py-1 text-[11px] font-semibold"
-          style={{ background: accent + "1e", color: accent }}>
-          {LEVEL_LABEL[h.level]}
-        </span>
-
         {/* Action buttons */}
         <div className="flex items-center gap-1">
           <motion.button
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
             onClick={toggleHistory}
-            title="Voir l'historique"
+            aria-label={`Voir l'historique de ${h.name}`}
             disabled={histBusy}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted transition-colors hover:bg-surface-2 hover:text-foreground disabled:opacity-40"
           >
@@ -219,7 +208,7 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
               <motion.button
                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
                 onClick={onEdit}
-                title="Modifier l'habitude"
+                aria-label={`Modifier ${h.name}`}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted transition-colors hover:bg-primary/10 hover:text-primary"
               >
                 <Pencil size={13} />
@@ -263,7 +252,7 @@ function HabitCard({ habit: h, index, userId, isArchiving, onArchive, onEdit, ca
                     whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
                     onClick={() => setConfirmArch(true)}
                     disabled={isArchiving}
-                    title="Archiver l'habitude"
+                    aria-label={`Archiver ${h.name}`}
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted transition-colors hover:bg-danger/10 hover:text-danger disabled:opacity-40"
                   >
                     <Archive size={14} />
@@ -298,11 +287,8 @@ function HabitHeatmap({ dates }: { dates: string[] }) {
   const doneSet = new Set(dates);
 
   // Générer les 28 derniers jours (du plus ancien au plus récent)
-  const today = new Date().toISOString().slice(0, 10);
-  const days  = Array.from({ length: 28 }, (_, i) => {
-    const d = new Date(Date.now() - (27 - i) * 864e5);
-    return d.toISOString().slice(0, 10);
-  });
+  const today = todayLocal();
+  const days  = Array.from({ length: 28 }, (_, i) => daysAgoLocal(27 - i));
 
   // Découper en 4 semaines
   const weeks = [days.slice(0, 7), days.slice(7, 14), days.slice(14, 21), days.slice(21, 28)];
@@ -351,7 +337,7 @@ function HabitHeatmap({ dates }: { dates: string[] }) {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-right text-[11px] text-muted">
+      <p className="mt-2 text-right text-[11px] tabular-nums text-muted">
         {dates.length} / 28 jours complétés
       </p>
     </div>

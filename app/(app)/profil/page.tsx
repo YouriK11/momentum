@@ -1,11 +1,17 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/data/profile";
 import { getActivityEvents } from "@/lib/data/social";
+import { getScoresFrom } from "@/lib/data/scores";
+import { daysAgoBrussels } from "@/lib/date";
 import { ProfileView } from "@/components/profile/profile-view";
 import { AvatarUploader } from "@/components/profile/avatar-uploader";
 import { ActivityTimeline } from "@/components/social/activity-timeline";
+import { ProfileHeatmap } from "@/components/profile/profile-heatmap";
 import type { Badge } from "@/lib/types";
+
+export const metadata: Metadata = { title: "Mon profil" };
 
 export default async function MyProfilePage() {
   const supabase = await createClient();
@@ -13,13 +19,15 @@ export default async function MyProfilePage() {
   const userId = user?.id;
   if (!userId) redirect("/login");
 
-  const [{ data: profile }, { data: badgeRows }, events] = await Promise.all([
+  const [{ data: profile }, { data: badgeRows }, events, { data: scoreRows }] = await Promise.all([
     getProfile(supabase, userId),
     supabase.from("user_badges").select("badge:badges(code,name,description,icon)").eq("user_id", userId),
     getActivityEvents(supabase, userId, 20),
+    getScoresFrom(supabase, userId, daysAgoBrussels(364)),
   ]);
 
   const badges = (badgeRows ?? []).map((r) => (r as unknown as { badge: Badge }).badge).filter(Boolean);
+  const scores = (scoreRows ?? []).map((r) => ({ score_date: r.score_date, score: r.score ?? 0 }));
 
   return (
     <div className="flex flex-col gap-8">
@@ -36,7 +44,15 @@ export default async function MyProfilePage() {
         />
       </ProfileView>
 
-      {/* Progrès récents — after badges section */}
+      {/* Activité annuelle */}
+      <section className="card flex flex-col gap-4 p-5">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
+          Activité sur 52 semaines
+        </p>
+        <ProfileHeatmap days={scores} />
+      </section>
+
+      {/* Progrès récents */}
       <section className="flex flex-col gap-4">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
           Progrès récents

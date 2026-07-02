@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Groupes" };
 import { getUserGroups } from "@/lib/data/groups";
 import { getFeedEvents } from "@/lib/data/social";
 import { getProfile } from "@/lib/data/profile";
@@ -10,6 +13,7 @@ import { GroupsPanel } from "@/components/groups/groups-panel";
 import { CircleFeed } from "@/components/social/circle-feed";
 import { GoalsManager } from "@/components/goals/goals-manager";
 import type { Habit, GoalV2 } from "@/lib/types";
+import { todayBrussels } from "@/lib/date";
 
 interface Props {
   searchParams: Promise<Record<string, string>>;
@@ -25,7 +29,7 @@ export default async function GroupesPage({ searchParams }: Props) {
   const userId = user?.id;
   if (!userId) redirect("/login");
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayBrussels();
 
   // Always fetch groups (used in "Mes groupes" tab)
   const [{ data: groups }, feedEvents, profileResult, rawGoals, habitsResult] = await Promise.all([

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { GoalType } from "@/lib/types";
+import { todayBrussels } from "@/lib/date";
 
 export type GoalActionResult = { error?: string };
 
@@ -37,7 +38,7 @@ export async function createGoalV2(data: {
 
   if (data.target < 1) return { error: "La cible doit être d'au moins 1." };
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayBrussels();
   let start_date: string | null = null;
   let end_date: string | null = null;
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, Award } from "lucide-react";
 import { updateUsername } from "@/app/(app)/profil/actions";
 import { useToast } from "@/components/ui/toast";
 import type { Badge } from "@/lib/types";
@@ -89,11 +89,12 @@ export function ProfileView({
                   />
                   <motion.button
                     whileTap={{ scale: 0.88 }} onClick={save} disabled={busy}
+                    aria-label="Enregistrer le pseudo"
                     className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary disabled:opacity-50"
                   >
                     <Check size={13} />
                   </motion.button>
-                  <button onClick={cancel} className="flex h-7 w-7 items-center justify-center rounded-full text-muted hover:text-foreground">
+                  <button onClick={cancel} aria-label="Annuler" className="flex h-7 w-7 items-center justify-center rounded-full text-muted hover:text-foreground">
                     <X size={13} />
                   </button>
                 </motion.div>
@@ -111,7 +112,7 @@ export function ProfileView({
                   <motion.button
                     whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}
                     onClick={() => { setInputVal(username); setEditing(true); }}
-                    title="Modifier le pseudo"
+                    aria-label="Modifier le pseudo"
                     className="flex h-6 w-6 items-center justify-center rounded-full text-muted hover:text-foreground"
                   >
                     <Pencil size={12} />
@@ -165,7 +166,10 @@ export function ProfileView({
               >
                 <div className="absolute inset-x-0 top-0 h-px"
                   style={{ background: "linear-gradient(90deg, transparent, rgba(196,168,130,0.28), transparent)" }} />
-                <span className="text-3xl">{b.icon ?? "🏅"}</span>
+                {b.icon
+                  ? <span className="text-3xl">{b.icon}</span>
+                  : <div className="flex h-10 w-10 items-center justify-center rounded-[12px]" style={{ background: "rgba(196,168,130,0.1)" }}><Award size={20} style={{ color: "#c4a882" }} /></div>
+                }
                 <p className="mt-3 text-[14px] font-semibold leading-tight">{b.name}</p>
                 {b.description && (
                   <p className="mt-1 text-[12px] leading-relaxed" style={{ color: "var(--color-muted)" }}>{b.description}</p>
@@ -179,7 +183,12 @@ export function ProfileView({
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">Trophées</p>
           <div className="flex flex-col items-center gap-3 rounded-[20px] border border-dashed p-12 text-center"
             style={{ borderColor: "rgba(255,255,255,0.09)" }}>
-            <span className="text-4xl">🏅</span>
+            <div
+              className="flex h-14 w-14 items-center justify-center rounded-[18px]"
+              style={{ background: "rgba(255,255,255,0.04)" }}
+            >
+              <Award size={24} className="text-muted" />
+            </div>
             <div>
               <p className="font-semibold">Aucun badge pour l&apos;instant</p>
               <p className="mt-1 text-[14px]" style={{ color: "var(--color-muted)" }}>

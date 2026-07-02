@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Aujourd'hui" };
 import { getProfile } from "@/lib/data/profile";
 import { getActiveHabits, getTodayLogs } from "@/lib/data/habits";
 import { getScoresFrom } from "@/lib/data/scores";
@@ -9,6 +12,7 @@ import { ActivityFeed } from "@/components/today/activity-feed";
 import { FriendActivityBar } from "@/components/social/friend-activity-bar";
 import { OnboardingModal } from "@/components/profile/onboarding-modal";
 import type { Habit } from "@/lib/types";
+import { todayBrussels, daysAgoBrussels } from "@/lib/date";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -16,8 +20,8 @@ export default async function HomePage() {
   const userId = user?.id;
   if (!userId) redirect("/login");
 
-  const today = new Date().toISOString().slice(0, 10);
-  const day7  = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+  const today = todayBrussels();
+  const day7  = daysAgoBrussels(6);
 
   const [
     { data: profile },

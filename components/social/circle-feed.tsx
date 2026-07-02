@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Trophy, Flame, Target, Star, Users } from "lucide-react";
+import { prevDay } from "@/lib/date";
 import type { ActivityEventType } from "@/lib/types";
 import type { FeedEvent } from "@/lib/data/social";
 import { ReactionBar } from "./reaction-bar";
@@ -19,7 +21,7 @@ const EVENT_META: Record<
     icon: <Flame size={14} />,
     color: "var(--color-primary)",
     bg: "rgba(203,139,106,0.15)",
-    label: (p) => `est sur une série de ${p.streak} jours 🔥`,
+    label: (p) => `est sur une série de ${p.streak} jours`,
   },
   goal_achieved: {
     icon: <Target size={14} />,
@@ -38,11 +40,9 @@ const EVENT_META: Record<
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function dayLabel(dateStr: string, today: string): string {
   if (dateStr === today) return "Aujourd'hui";
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (dateStr === yesterday.toISOString().slice(0, 10)) return "Hier";
+  if (dateStr === prevDay(today)) return "Hier";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  return d.toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
 }
 
 function groupByDay(events: FeedEvent[]): { date: string; events: FeedEvent[] }[] {
@@ -59,9 +59,11 @@ function groupByDay(events: FeedEvent[]): { date: string; events: FeedEvent[] }[
 function Avatar({ name, url }: { name: string; url: string | null }) {
   if (url) {
     return (
-      <img
+      <Image
         src={url} alt={name}
-        className="h-8 w-8 rounded-full object-cover"
+        width={32} height={32}
+        className="rounded-full object-cover"
+        style={{ width: 32, height: 32 }}
       />
     );
   }
@@ -84,7 +86,7 @@ function FeedItem({
   currentUserId: string;
 }) {
   const meta = EVENT_META[event.type];
-  const time = new Date(event.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const time = new Date(event.created_at).toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" });
 
   return (
     <div

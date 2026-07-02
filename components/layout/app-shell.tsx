@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Flame, Home, Users, ListChecks, User, LogOut, Bell } from "lucide-react";
-import { motion } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
+import { Flame, Home, Users, ListChecks, User, LogOut, Bell, Keyboard } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "@/components/profile/avatar";
 import { signout } from "@/app/auth/actions";
 import { PageTransition } from "@/components/layout/page-transition";
@@ -13,6 +14,14 @@ const NAV = [
   { href: "/groupes", label: "Groupes",     Icon: Users },
   { href: "/habits",  label: "Habitudes",   Icon: ListChecks },
   { href: "/profil",  label: "Profil",      Icon: User },
+] as const;
+
+const SHORTCUTS = [
+  { keys: ["G", "H"], label: "Aller à Aujourd'hui" },
+  { keys: ["G", "A"], label: "Aller à Habitudes" },
+  { keys: ["G", "G"], label: "Aller à Groupes" },
+  { keys: ["G", "P"], label: "Aller à Profil" },
+  { keys: ["?"],      label: "Afficher les raccourcis" },
 ] as const;
 
 export function AppShell({
@@ -26,8 +35,44 @@ export function AppShell({
   unreadCount?: number;
   children: React.ReactNode;
 }) {
-  const path = usePathname();
+  const path     = usePathname();
+  const router   = useRouter();
   const isActive = (href: string) => path.startsWith(href);
+
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const pendingG = useRef(false);
+  const gTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const key = e.key.toLowerCase();
+
+      if (e.key === "Escape") { setShowShortcuts(false); pendingG.current = false; return; }
+      if (e.key === "?") { e.preventDefault(); setShowShortcuts((v) => !v); return; }
+
+      if (key === "g" && !pendingG.current) {
+        pendingG.current = true;
+        if (gTimer.current) clearTimeout(gTimer.current);
+        gTimer.current = setTimeout(() => { pendingG.current = false; }, 800);
+        return;
+      }
+
+      if (pendingG.current) {
+        pendingG.current = false;
+        if (gTimer.current) clearTimeout(gTimer.current);
+        if (key === "h") router.push("/home");
+        else if (key === "a") router.push("/habits");
+        else if (key === "g") router.push("/groupes");
+        else if (key === "p") router.push("/profil");
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [router]);
 
   return (
     <div className="flex min-h-dvh">
@@ -106,9 +151,25 @@ export function AppShell({
           })}
         </nav>
 
+        {/* Keyboard shortcut hint */}
+        <button
+          onClick={() => setShowShortcuts(true)}
+          className="mb-3 mt-auto flex items-center gap-2 rounded-[10px] px-3 py-2 text-[12px] font-medium transition-colors hover:bg-white/5"
+          style={{ color: "var(--color-muted)" }}
+        >
+          <Keyboard size={13} />
+          <span>Raccourcis</span>
+          <kbd
+            className="ml-auto rounded-[5px] px-1.5 py-0.5 font-mono text-[10px]"
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+          >
+            ?
+          </kbd>
+        </button>
+
         {/* User card */}
         <div
-          className="mt-auto rounded-[14px] p-3"
+          className="rounded-[14px] p-3"
           style={{
             background: "rgba(255,255,255,0.025)",
             border: "1px solid rgba(255,255,255,0.065)",
@@ -204,6 +265,61 @@ export function AppShell({
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
+
+      {/* ── Keyboard shortcuts overlay ────────────────────────────────── */}
+      <AnimatePresence>
+        {showShortcuts && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)" }}
+            onClick={() => setShowShortcuts(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 12 }}
+              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              className="w-full max-w-sm rounded-[20px] p-6"
+              style={{ background: "var(--color-surface)", border: "1px solid rgba(255,255,255,0.1)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-5 flex items-center gap-2.5">
+                <Keyboard size={16} style={{ color: "var(--color-primary)" }} />
+                <p className="font-display text-[15px] font-semibold">Raccourcis clavier</p>
+              </div>
+              <ul className="flex flex-col gap-2">
+                {SHORTCUTS.map(({ keys, label }) => (
+                  <li key={label} className="flex items-center justify-between gap-4">
+                    <span className="text-[13px]" style={{ color: "var(--color-muted)" }}>{label}</span>
+                    <span className="flex items-center gap-1">
+                      {keys.map((k) => (
+                        <kbd
+                          key={k}
+                          className="rounded-[6px] px-2 py-0.5 font-mono text-[11px] font-semibold"
+                          style={{
+                            background: "rgba(255,255,255,0.06)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            color: "var(--color-foreground)",
+                          }}
+                        >
+                          {k}
+                        </kbd>
+                      ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 text-[11px]" style={{ color: "var(--color-muted)" }}>
+                Appuie sur <kbd className="rounded px-1 font-mono text-[10px]" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>Esc</kbd> pour fermer
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Mobile bottom nav ─────────────────────────────────────────── */}
       <nav

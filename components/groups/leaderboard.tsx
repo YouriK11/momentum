@@ -2,13 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Flame, Crown } from "lucide-react";
 
 type Row = { userId: string; username: string; streak: number; today: number; weekAvg: number };
 type Ranked = Row & { rank: number; value: number };
 
 const bandColor = (s: number) =>
   s >= 80 ? "var(--color-success)" : s >= 50 ? "var(--color-warning)" : "var(--color-danger)";
-const medal = (r: number) => (r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : `${r}`);
+function PodiumRank({ rank }: { rank: number }) {
+  if (rank === 1) return <Crown size={20} style={{ color: "#c4a882" }} />;
+  const color = rank === 2 ? "#a89e8d" : "#cb8b6a";
+  return <span className="font-display text-lg font-bold" style={{ color }}>{rank}</span>;
+}
 
 export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
   const [mode, setMode] = useState<"today" | "week">("today");
@@ -57,7 +62,9 @@ export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
         <div className="flex items-end justify-center gap-3">
           {podiumOrder.map((r) => (
             <div key={r.userId} className="flex flex-1 flex-col items-center">
-              <div className="mb-2 text-2xl" aria-hidden="true">{medal(r.rank)}</div>
+              <div className="mb-2 flex h-7 items-center justify-center" aria-hidden="true">
+                <PodiumRank rank={r.rank} />
+              </div>
               <Link
                 href={`/profil/${r.userId}`}
                 className="mb-1 max-w-full truncate text-sm font-medium hover:underline underline-offset-2"
@@ -107,7 +114,10 @@ export function Leaderboard({ rows, meId }: { rows: Row[]; meId: string }) {
                 <span className="ml-2 text-xs" style={{ color: "var(--color-primary)" }}>toi</span>
               )}
             </span>
-            <span className="text-xs text-muted" aria-label={`Série ${r.streak} jours`}>🔥 {r.streak}</span>
+            <span className="flex items-center gap-1 text-xs text-muted" aria-label={`Série ${r.streak} jours`}>
+              <Flame size={11} style={{ color: "var(--color-primary)" }} />
+              <span className="tabular-nums">{r.streak}</span>
+            </span>
             <span
               className="w-10 text-right text-sm font-semibold tabular-nums"
               style={{ color: bandColor(r.value) }}

@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Mes habitudes" };
 import { getActiveHabits } from "@/lib/data/habits";
 import { getUserGroups } from "@/lib/data/groups";
 import { HabitManager } from "@/components/habits/habit-manager";
